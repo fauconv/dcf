@@ -1,0 +1,14 @@
+vendor
+web/.*
+web/core/**/*
+web/core/*
+web/sites/default/*
+web/sites/default/**/*
+example.*
+composer.lock
+web/autoload.php
+web/index.php
+web/robots.txt
+web/sites/development.services.yml
+web/update.php
+web/web.config
