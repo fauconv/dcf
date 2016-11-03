@@ -1,0 +1,6 @@
+{
+  "name": "Indus drupal8 angular2",
+  "tagline": "angular2  drupal8 angularJS",
+  "body": "The main goal is to use angular 2 to display datas from Drupal 8.\r\nThe second objective is to create a way for a frontend developer and a backend developer to work in same time, without the frontend developer have to wait for frontend data",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
