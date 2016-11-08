@@ -9,5 +9,6 @@ The goals are :
 TODO
 * Create install script using drush or web console (move config file out of web, move content files out of sites ?) (think to trusted_host_patterns) 
 * modify composer.json to require drupal and repository to this git
+* add a script for crontab
 
 THE PROJECT IS JUST AT THE BEGINNING PHASE, NO STABLE VERSION YET.
