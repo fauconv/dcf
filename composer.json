@@ -21,7 +21,9 @@
         "cweagans/composer-patches": "~1.0",
         "drupal/core": "~8.0",
         "drush/drush": "~8.0",
-        "drupal/console": "~1.0"
+        "drupal/console": "~1.0",
+        "drupal/restui": "^1.12",
+        "drupal/admin_menu": "3.x-dev"
     },
     "conflict": {
         "drupal/drupal": "*"
