@@ -1,8 +1,7 @@
 {
-    "name": "fauconv/drupal8_angular2",
-    "description": "Integrate angular 2 in drupal 8",
+    "name": "#",
     "type": "project",
-    "license": "GPL-2.0+",
+    "license": "GPL-3.0+",
     "authors": [
         {
             "name": "Fauconv",
@@ -21,9 +20,25 @@
         "cweagans/composer-patches": "~1.0",
         "drupal/core": "~8.0",
         "drush/drush": "~8.0",
-        "drupal/console": "~1.0",
+        "drupal/console": "^1.0",
+        "drupal/admin_menu": "3.x-dev",
+        "drupal/composer_manager":"1.x-dev",
+        "mouf/nodejs-installer": "~1.0"
+    },
+    "require-dev": {
+        "behat/mink": "~1.7",
+        "behat/mink-goutte-driver": "~1.2",
+        "jcalderonzumba/gastonjs": "~1.0.2",
+        "jcalderonzumba/mink-phantomjs-driver": "~0.3.1",
+        "mikey179/vfsStream": "~1.2",
+        "phpunit/phpunit": "~4.8",
+        "symfony/css-selector": "~2.8",
+        "drupal/generator_ui": "1.x-dev",
+        "drupal/edit_ui":"1.x-dev",
+        "drupal/libraries_ui":"1.x-dev",
+        "drupal/breakpoints_ui":"1.x-dev",
         "drupal/restui": "^1.12",
-        "drupal/admin_menu": "3.x-dev"
+        "drupal/module_builder":"3.x-dev"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -51,7 +66,13 @@
             "web/modules/contrib/{$name}": ["type:drupal-module"],
             "web/profiles/contrib/{$name}": ["type:drupal-profile"],
             "web/themes/contrib/{$name}": ["type:drupal-theme"],
-	    "drush/contrib/{$name}": ["type:drupal-drush"]        
-       }
+	        "drush/contrib/{$name}": ["type:drupal-drush"]        
+       },
+       "mouf": {
+            "nodejs": {
+                "version": "~6.9.1",
+                "forceLocal": true
+            }
+        }
     }
 }

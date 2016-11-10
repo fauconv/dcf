@@ -1,0 +1,121 @@
+#!/bin/bash
+
+function showHelp {
+  echo ""
+  echo ""
+  echo "usage : $0 <comand> <args>"
+  echo ""
+  echo "Commands :"
+  echo ""
+  echo "  $0 create <project_name>  : create a drupal/angular project for development. You have to git init your project to save it after create "
+  echo "  install : install the project already created for development after a git clone of the project"
+  echo "  package : create a package for deployment in production"
+  echo "  deploy  : deploy the package in production (like install for dev)"
+  echo "  update  : update the project in production or dev"
+  echo ""
+  echo ""
+  exit 0
+}
+
+function checkGit {
+  if command -v git >/dev/null 2>&1; then
+  else
+    echo ""
+    echo ""
+    echo "git must be installed and define in the \$PATH variable"
+    echo ""
+    echo ""
+    exit 0
+  fi
+}
+
+function checkPHP {
+  if command -v php >/dev/null 2>&1; then
+  else
+    echo ""
+    echo ""
+    echo "php must be installed and define in the \$PATH variable"
+    echo ""
+    echo ""
+    exit 0
+  fi
+  phpver=`php -v |grep -Eow '^PHP [^ ]+' |gawk '{ print $2 }'`
+  if version_gt 5.65$phpver; then
+    echo ""
+    echo ""
+    echo "php version must be greeter than 5.5"
+    echo ""
+    echo ""
+    exit 0
+  fi
+}
+
+if [ "$1" = "" ]; then
+    showHelp;
+fi
+
+case $1 in
+  create )  create $2
+            ;;
+  install ) install
+            ;;
+  package ) package
+            ;;
+  deploy )  deploy
+            ;;
+  update )  update
+            ;;
+       * )  showHelp
+            ;;
+esac
+exit 0
+
+function create {
+  if [ "$1" = "" ]; then
+      showHelp;
+  fi
+  checkGit
+  if [ ! -f "composer.json" ] then
+    if [ -d ".git" ] then
+      echo ""
+      echo ""
+      echo "Can not create project from an existing git directory"
+      echo ""
+      echo ""
+      exit 0
+    fi
+    git clone https://github.com/fauconv/indus_drupal8_angular2.git .
+    rm -rf .git
+  fi
+  sed -e '/#/$1' composer.json
+  exit 1
+}
+
+function install {
+  checkPHP
+  cd scripts
+  php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+  php composer-setup.php
+  rm composer-setup.php
+  cd ..
+  php scripts/composer.phar install
+  vendor/bin/npm install
+  
+  exit 1
+}
+
+function package {
+
+}
+
+function deploy {
+
+}
+
+function update {
+
+}
+
+function version_gt {
+  test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1";
+}
