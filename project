@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#
+# showHelp
+#
 function showHelp {
   echo ""
   echo ""
@@ -8,18 +11,21 @@ function showHelp {
   echo "Commands :"
   echo ""
   echo "  $0 create <project_name>  : create a drupal/angular project for development. You have to git init your project to save it after create "
-  echo "  install : install the project already created for development after a git clone of the project"
-  echo "  package : create a package for deployment in production"
-  echo "  deploy  : deploy the package in production (like install for dev)"
-  echo "  update  : update the project in production or dev"
+  echo "  $0 install : install the project already created for development after a git clone of the project"
+  echo "  $0 build   : compil and build project for development"
+  echo "  $0 package : create a package for deployment in production"
+  echo "  $0 deploy  : deploy the package in production (like install+build for dev)"
+  echo "  $0 update  : update the project in production or dev"
   echo ""
   echo ""
   exit 0
 }
 
+#
+# checkGit
+#
 function checkGit {
-  if command -v git >/dev/null 2>&1; then
-  else
+  if ! command -v git >/dev/null 2>&1; then
     echo ""
     echo ""
     echo "git must be installed and define in the \$PATH variable"
@@ -29,9 +35,14 @@ function checkGit {
   fi
 }
 
+#
+# checkPHP
+#
+function version_gt {
+  test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1";
+}
 function checkPHP {
-  if command -v php >/dev/null 2>&1; then
-  else
+  if ! command -v php >/dev/null 2>&1; then
     echo ""
     echo ""
     echo "php must be installed and define in the \$PATH variable"
@@ -40,7 +51,7 @@ function checkPHP {
     exit 0
   fi
   phpver=`php -v |grep -Eow '^PHP [^ ]+' |gawk '{ print $2 }'`
-  if version_gt 5.65$phpver; then
+  if version_gt 5.65 $phpver; then
     echo ""
     echo ""
     echo "php version must be greeter than 5.5"
@@ -50,6 +61,23 @@ function checkPHP {
   fi
 }
 
+#
+# checkComposer
+#
+function checkConposer {
+  if [ ! -f "scripts/composer.phar" ] then
+    cd scripts
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    php composer-setup.php
+    rm composer-setup.php
+    cd ..
+  fi
+}
+
+
+#
+# main
+#
 if [ "$1" = "" ]; then
     showHelp;
 fi
@@ -59,22 +87,29 @@ case $1 in
             ;;
   install ) install
             ;;
+  build ) build
+            ;;
   package ) package
             ;;
   deploy )  deploy
             ;;
   update )  update
             ;;
-       * )  showHelp
+       * )  
+            echo "unknown command : $1"
+            showHelp
             ;;
 esac
 exit 0
 
+#
+# create
+#
 function create {
   if [ "$1" = "" ]; then
+      echo "project's name missing"
       showHelp;
   fi
-  checkGit
   if [ ! -f "composer.json" ] then
     if [ -d ".git" ] then
       echo ""
@@ -84,38 +119,51 @@ function create {
       echo ""
       exit 0
     fi
+    checkGit
     git clone https://github.com/fauconv/indus_drupal8_angular2.git .
     rm -rf .git
   fi
-  sed -e '/#/$1' composer.json
+  sed 's|#|$1' composer.json > composer.json2
+  rm composer.json
+  mv composer.json2 composer.json
   exit 1
 }
 
+#
+# create
+#
 function install {
   checkPHP
-  cd scripts
-  php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-  php composer-setup.php
-  rm composer-setup.php
-  cd ..
+  checkComposer
   php scripts/composer.phar install
   vendor/bin/npm install
-  
   exit 1
 }
 
+#
+# build
+#
+function build {
+  exit 1
+}
+
+#
+# package
+#
 function package {
-
+  exit 1
 }
 
+#
+# deploy 
+#
 function deploy {
-
+  exit 1
 }
 
+#
+# update
+#
 function update {
-
-}
-
-function version_gt {
-  test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1";
+  exit 1
 }
