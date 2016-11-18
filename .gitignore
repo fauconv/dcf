@@ -30,6 +30,8 @@ build/Release
 # Dependency directories
 node_modules
 jspm_packages
+vendor
+composer.lock
 
 # Optional npm cache directory
 .npm
@@ -46,22 +48,28 @@ jspm_packages
 # Mac os files
 .DS_Store
 
+# Compiled JS
 web/**/*.js
 web/**/*.js.map
-vendor
+
+# IDE directory
+nbproject/*
+nbproject/**/*
+
+# Drupal package from composer
 web/.*
 web/core/**/*
 web/core/*
 web/sites/default/*
 web/sites/default/**/*
 example.*
-composer.lock
 web/autoload.php
 web/index.php
 web/robots.txt
 web/sites/development.services.yml
 web/update.php
 web/web.config
+web/modules/contrib
 
 
 
