@@ -1,40 +1,52 @@
 #!/bin/bash
+#+-----------------------------------------------------------+
+#| Batch to Manage the entire multi-site/farm/factory/project|
+#+-----------------------------------------------------------+
+#| version : ${VERSION_SCRIPT}                               |
+#+-----------------------------------------------------------+
 
 #
 # const
 #
+VERSION_SCRIPT="0.1.0"
 PHP_VER=5.5.9 #PHP minimum version for drupal
 DRUPAL_ANGULAR_URL=https://github.com/fauconv/indus_drupal8_angular2.git
 DRUPAL_ANGULAR_TAG=master
+SCRIPT_NAME=$(basename $0)
+SCRIPTS_PATH=scripts #depth need to be only 1
 
 #
 # showHelp
 #
 function showHelp {
-  name=$(basename $0)
+
+  echo ""
+  echo "Drupal Custom Factory Manager"
+  echo "${SCRIPT_NAME} Version ${VERSION_SCRIPT}"
   echo ""
   echo ""
-  echo "usage : $name <command> <args>"
-  echo ""
-  echo "* Commands :"
-  echo ""
-  echo "  $name create <params>   : create a multisite drupal project for development. (get the project skeleton from git)"
-  echo "  $name deploy (dev | prod) : get common composer and npm packages for the project"
-  echo "  $name site create <id> <canonical_url> : create a new website in the project for development. (create website skeleton)"
-  echo "  $name site deploy (dev | prod) <id> : get specific composer and npm packages for the website"
-  echo "  $name site install (dev|prod) <id> : install a site already created for development or production (drupal install of the website)"
-  echo "  $name site build (dev|prod) <id>  : compil and build a site for frontend in development"
-  echo "  $name package : create a package for deployment in production of a project without website."
-  echo "  $name site package <id> : create a package for deployment in production of a specific website"
-  echo "  $name update  : update the project in production or dev"
-  echo "  $name site update <id> : update a site in production or dev"
-  echo ""
-  echo ""
-  echo "* create :"
-  echo ""
-  echo "  $name create project-name [project-description]"
+  echo "= Usage :"
+  echo "========="
+  echo "  ${SCRIPT_NAME} create <project-name> [<project-description>]   : create a multisite drupal project for development. (get the project skeleton from git)"
+  echo "  ${SCRIPT_NAME} deploy (dev | prod)                             : get common composer and npm packages for the project"
+  echo "  ${SCRIPT_NAME} site create <site_id>                           : create a new web-site in the project for development based on the file config/site_id.conf. (create web-site skeleton)"
+  echo "  ${SCRIPT_NAME} site deploy (dev | prod) <site-id>              : get specific composer and npm packages for the website"
+  echo "  ${SCRIPT_NAME} site install (dev|prod) <site-id>               : install a web-site already created for development or production (drupal install of the web-site)"
+  echo "  ${SCRIPT_NAME} site build (dev|prod) <site-id>                 : compil and build a site for frontend in development"
+  echo "  ${SCRIPT_NAME} list                                            : list all web-site (site-id) in this project"
+  echo "  ${SCRIPT_NAME} package                                         : create a package for deployment in production of a project without web-site."
+  echo "  ${SCRIPT_NAME} site package <site-id>                          : create a package for deployment in production of a specific web-site"
+  echo "  ${SCRIPT_NAME} update                                          : update the project in production or dev"
+  echo "  ${SCRIPT_NAME} site update <site-id>                           : update a site in production or dev"
   echo ""
   echo ""
+  echo "= More help :"
+  echo "============="
+  echo "Read install.md in docs directory for more information"
+  echo ""
+  echo ""
+  echo "= Exemples :"
+  echo "============"
   exit 1
 }
 
@@ -92,8 +104,8 @@ function checkConposer {
     echo ""
     exit 1
   fi
-  if [ ! -f "scripts/composer.phar" ]; then
-    cd scripts
+  if [ ! -f "${SCRIPTS_PATH}/composer.phar" ]; then
+    cd ${SCRIPTS_PATH}
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
     php composer-setup.php
     rm composer-setup.php
@@ -108,14 +120,14 @@ function deploy {
   checkConposer
   if [ "$1" = "prod" ]; then
     echo "Composer install (prod):"
-    php scripts/composer.phar install --no-dev
+    php ${SCRIPTS_PATH}/composer.phar install --no-dev
     echo "NPM install (prod) :"
-    vendor/bin/npm install --only=prod --nodedir=vendor/bin --prefix=./web
+    ${SCRIPTS_PATH}/npm install --only=prod --nodedir=${SCRIPTS_PATH}/bin --prefix=web
   else
     echo "Composer install:"
-    php scripts/composer.phar install
+    php ${SCRIPTS_PATH}/composer.phar install
     echo "NPM install:"
-    vendor/bin/npm install --nodedir=vendor/bin --prefix=./web
+    ${SCRIPTS_PATH}/npm install --nodedir=${SCRIPTS_PATH}/bin --prefix=web
   fi
 }
 
@@ -123,7 +135,7 @@ function deploy {
 # create
 #
 function create {
-  if [ "$2" = "" ]; then
+  if [ "$1" = "" ]; then
       echo "project's name missing"
       showHelp;
   fi
@@ -146,13 +158,17 @@ function create {
     rm -rf clone
   fi
   echo "setup project $2..."
-  sed "s|\"name\" *: *\".*\"|\"name\": \"$2\"|" composer.json > composer.json2
-  sed "s|\"name\" *: *\".*\"|\"name\": \"$2\"|" package.json > package.json2
-  sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
-  sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" package.json2 > package.json
+  sed "s|\"name\" *: *\".*\"|\"name\": \"$1\"|" composer.json > composer.json2
+  sed "s|\"name\" *: *\".*\"|\"name\": \"$1\"|" package.json > package.json2
+  sed "s|\"description\" *: *\".*\"|\"description\": \"$2\"|" composer.json2 > composer.json
+  sed "s|\"description\" *: *\".*\"|\"description\": \"$2\"|" package.json2 > package.json
   rm composer.json2 package.json2
-  rm $1
-  chmod 755 scripts/project
+  rm ${SCRIPT_NAME}
+  chmod 755 ${SCRIPTS_PATH}/project
+}
+
+function site_create {
+
 }
 
 #
@@ -162,15 +178,36 @@ cd $(dirname $0)
 if [ "$1" = "" ]; then
     showHelp;
 fi
+if [ ! "$1" = "create" ]; then
+    cd ..
+fi
 
 case $1 in
-  create ) create $0 $2 $3
-            ;;
-  deploy ) cd ..;deploy $2
-            ;;
-       * )
-            echo "unknown command : $1"
-            showHelp
-            ;;
+  create )
+          create "$2" "$3"
+          ;;
+  deploy )
+          deploy "$2"
+          ;;
+  site )
+          case $2
+            create )
+                      site_create "$3"
+                      ;;
+            deploy )
+                      site_deploy "$3" "$4"
+                      ;;
+            install )
+                      site_install "$3" "$4"
+                      ;;
+            * )
+                      echo "unknown command : $1"
+                      showHelp
+                      ;;
+          esac
+  * )
+          echo "unknown command : $1"
+          showHelp
+          ;;
 esac
 exit 0

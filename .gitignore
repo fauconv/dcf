@@ -49,31 +49,29 @@ composer.lock
 .DS_Store
 
 # Compiled JS
-web/**/*.js
-web/**/*.js.map
+/web/**/*.js
+/web/**/*.js.map
 
 # IDE directory
 nbproject/*
 nbproject/**/*
 
 # test directory
-test/*
-test/**/*
+/test/*
+/test/**/*
 
 # Drupal package from composer
-web/.*
-web/core/**/*
-web/core/*
-web/sites/default/*
-web/sites/default/**/*
+/web/.*
+/web/core/**/*
+/web/core/*
+/web/sites/default/*
+/web/sites/default/**/*
 example.*
-web/autoload.php
-web/index.php
-web/robots.txt
-web/sites/development.services.yml
-web/update.php
-web/web.config
-web/modules/contrib
-
-
-
+/web/autoload.php
+/web/index.php
+/web/robots.txt
+/web/sites/development.services.yml
+/web/update.php
+/web/web.config
+/web/modules/contrib
+/web/sites/*/modules/contrib

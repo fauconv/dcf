@@ -1,15 +1,22 @@
-Welcome to the indus_drupal8_angular2 wiki!
+# Welcome to the Drupal Custom Factory Project version 0.1.0
 
-The goals are : 
+This project is just a **SANDBOX** for the moment. **No stable version is provided yet**
 
-* display datas from Drupal 8 with Angular 2
+
+## The goals are
+
+* display datas from Drupal 8 with Angular 2 and ionic 2
 * find a way for backend developers work with frontend developers in same time (frontend should dont have to wait data from backend to work)
-* avoid problem of seo with angular (not a full single page application)
+* avoid problem of SEO with angular (not a full single page application)
+* Give a standalone Distribution of Drupal 8 to develop with angular (composer, and nodejs are downloaded locally in the project, no global tool needed). Only PHP Cli and a web server (suggest Apache) are needed
 
-TODO
-* Create install script using drush or web console (move config file out of web, move content files out of sites ?) (think to trusted_host_patterns) 
-* modify composer.json to require drupal and repository to this git
+
+## TODO
+
 * add a script for crontab
-* create many install mode : dev mode, prod mode with composer only, prod mode with composer and npm, prod mode with git only, prod mode with nothing. this mean create build script and install script
-
-THE PROJECT IS JUST AT THE BEGINNING PHASE, NO STABLE VERSION YET.
+* Install website with drupal console + add multi level node_modules (specific npm module should be installed in the site directory, and common npm module in the "web" directory)
+* provide multi modes to use angular :
+    * a drupal web-service + angular composant : node, taxo... (single page web-site) + drupal web page for SEO
+    * a drupal theme like of angular generation (multi page web-site) with dynamic blocs
+    * a drupal web-service +  ionic 2 (single page application)
+    * a standard drupal web-site without angular
