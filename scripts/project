@@ -1,15 +1,22 @@
 #!/bin/bash
 
 #
+# const
+#
+PHP_VER=5.5.9 #PHP minimum version for drupal
+DRUPAL_ANGULAR_URL=https://github.com/fauconv/indus_drupal8_angular2.git
+DRUPAL_ANGULAR_TAG=master
+
+#
 # showHelp
 #
 function showHelp {
   name=$(basename $0)
   echo ""
   echo ""
-  echo "usage : $name <comand> <args>"
+  echo "usage : $name <command> <args>"
   echo ""
-  echo "Commands :"
+  echo "* Commands :"
   echo ""
   echo "  $name create <params>   : create a multisite drupal project for development. You have to git init, commit and push your project to save it after create "
   echo "  $name checkout <params> : get an already created multisite drupal project from a git for development or production (TODO)"
@@ -20,6 +27,11 @@ function showHelp {
   echo "  $name site package : create a package for deployment in production of a project"
   echo "  $name update  : update the project in production or dev"
   echo "  $name site update  : update a site in production or dev"
+  echo ""
+  echo ""
+  echo "* create :"
+  echo ""
+  echo "  $name create project-name [project-description]"
   echo ""
   echo ""
   exit 1
@@ -55,10 +67,11 @@ function checkPHP {
     exit 1
   fi
   phpver=`php -v |grep -Eow '^PHP [^ ]+' |gawk '{ print $2 }'`
-  if version_gt 5.65 $phpver; then
+  echo "Current PHP version : $phpver"
+  if version_gt $PHP_VER $phpver; then
     echo ""
     echo ""
-    echo "php version must be greeter than 5.5"
+    echo "php version must be greeter than $PHP_VER"
     echo ""
     echo ""
     exit 1
@@ -69,7 +82,8 @@ function checkPHP {
 # checkComposer
 #
 function checkConposer {
-  if [ ! -f "scripts/composer.phar" ]; then
+  echo "CheckComposer:"
+  if [ ! -f "composer.phar" ]; then
     cd scripts
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
     php composer-setup.php
@@ -78,15 +92,92 @@ function checkConposer {
   fi
 }
 
+
+#
+# create
+#
+function create {
+  if [ "$2" = "" ]; then
+      echo "project's name missing"
+      showHelp;
+  fi
+  checkPHP
+  if [ ! -f "composer.json" ]; then
+    if [ -d ".git" ]; then
+      echo ""
+      echo ""
+      echo "Can not create project from an existing git directory"
+      echo ""
+      echo ""
+      exit 1
+    fi
+    checkGit
+    echo "git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG"
+    git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG clone
+    rm -rf clone/.git
+    mv clone/* . 2> /dev/null
+    mv clone/.* . 2> /dev/null
+    rm -rf clone
+  fi
+  echo "setup project $2..."
+  sed "s|\"name\" *: *\".*\"|\"name\": \"$2\"|" composer.json > composer.json2
+  sed "s|\"name\" *: *\".*\"|\"name\": \"$2\"|" package.json > package.json2
+  sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
+  sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" package.json2 > package.json
+  rm composer.json2 package.json2
+  install
+  rm $1
+}
+
+#
+# install
+#
+function install {
+  checkConposer
+  echo "Composer install:"
+  php scripts/composer.phar install
+  echo "NPM install:"
+  vendor/bin/npm install
+}
+
+#
+# build
+#
+function build {
+  cd ..
+}
+
+#
+# package
+#
+function package {
+  cd ..
+}
+
+#
+# deploy
+#
+function deploy {
+  cd ..
+}
+
+#
+# update
+#
+function update {
+  cd ..
+}
+
 #
 # main
 #
+cd $(dirname $0)
 if [ "$1" = "" ]; then
     showHelp;
 fi
 
 case $1 in
-  create )  create $2 $3
+  create )  create $0 $2 $3
             ;;
   checkout ) checkout $2
             ;;
@@ -105,73 +196,4 @@ case $1 in
             showHelp
             ;;
 esac
-exit 1
-
-#
-# create
-#
-function create {
-  if [ "$1" = "" ]; then
-      echo "project's name missing"
-      showHelp;
-  fi
-  checkPHP
-  if [ ! -f "composer.json" ] then
-    if [ -d ".git" ] then
-      echo ""
-      echo ""
-      echo "Can not create project from an existing git directory"
-      echo ""
-      echo ""
-      exit 1
-    fi
-    checkGit
-    git clone https://github.com/fauconv/indus_drupal8_angular2.git .
-    rm -rf .git
-  fi
-
-  sed 's|"name" *: *".*"|"name": "$1",|' composer.json > composer.json2
-  sed 's|"name" *: *".*"|"name": "$1",|' package.json > package.json2
-  sed 's|"description" *: *".*"|"description": "$2",|' composer.json2 > composer.json
-  sed 's|"description" *: *".*"|"description": "$2",|' package.json2 > package.json
-  rm composer.json2 package.json
-  install
-  exit 0
-}
-
-#
-# install
-#
-function install {
-  checkComposer
-  php scripts/composer.phar install
-  vendor/bin/npm install
-}
-
-#
-# build
-#
-function build {
-  exit 1
-}
-
-#
-# package
-#
-function package {
-  exit 1
-}
-
-#
-# deploy 
-#
-function deploy {
-  exit 1
-}
-
-#
-# update
-#
-function update {
-  exit 1
-}
+exit 0

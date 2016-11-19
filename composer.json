@@ -10,6 +10,9 @@
       "role": "Developer"
     }
   ],
+  "config": {
+    "bin-dir": "scripts"
+  },
   "repositories": [
     {
       "type": "composer",
@@ -52,15 +55,6 @@
       "scripts/composer/ScriptHandler.php"
     ]
   },
-  "scripts": {
-    "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
-    "pre-install-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
-    ],
-    "pre-update-cmd": [
-      "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
-    ]
-  },
   "extra": {
     "installer-paths": {
       "web/core": ["type:drupal-core"],
@@ -73,7 +67,7 @@
     "mouf": {
       "nodejs": {
         "version": "*",
-        "targetDir": "vendor",
+        "targetDir": "scripts",
         "forceLocal": true
       }
     }

@@ -56,6 +56,10 @@ web/**/*.js.map
 nbproject/*
 nbproject/**/*
 
+# test directory
+test/*
+test/**/*
+
 # Drupal package from composer
 web/.*
 web/core/**/*
