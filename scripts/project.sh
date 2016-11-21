@@ -19,34 +19,30 @@ SCRIPTS_PATH=scripts #depth need to be only 1
 # showHelp
 #
 function showHelp {
-
   echo ""
-  echo "Drupal Custom Factory Manager"
-  echo "${SCRIPT_NAME} Version ${VERSION_SCRIPT}"
+  echo "  Drupal Custom Factory Manager Version ${VERSION_SCRIPT}"
   echo ""
+  echo "  = Usage :"
+  echo "  ========="
+  echo "    ${SCRIPT_NAME} create <project-name> [<project-description>]   : create a multisite drupal project for development. (get the project skeleton from git)"
+  echo "    ${SCRIPT_NAME} deploy (dev | prod)                             : get common composer and npm packages for the project"
+  echo "    ${SCRIPT_NAME} site create <site_id>                           : create a new web-site in the project for development based on the file config/site_id.conf. (create web-site skeleton)"
+  echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site-id>              : get specific composer and npm packages for the website"
+  echo "    ${SCRIPT_NAME} site install (dev|prod) <site-id>               : install a web-site already created for development or production (drupal install of the web-site)"
+  echo "    ${SCRIPT_NAME} site build (dev|prod) <site-id>                 : compil and build a site for frontend in development"
+  echo "    ${SCRIPT_NAME} site fix <site-id>                              : Fix the version of packages (composer and npm) used for this site, usefull for production server, avoid unwanted update of package"
+  echo "    ${SCRIPT_NAME} site unfix <site-id>                            : Unfix the version of packages (composer and npm) used for this site, usefull to try update website package in development"
+  echo "    ${SCRIPT_NAME} fix                                             : as \"site fix\" but for the common packages of the project"
+  echo "    ${SCRIPT_NAME} unfix                                           : as \"site unfix\" but for the common packages of the project"
+  echo "    ${SCRIPT_NAME} list                                            : list all web-site (site-id) in this project"
+  echo "    ${SCRIPT_NAME} package                                         : create a package for deployment in production of a project without web-site."
+  echo "    ${SCRIPT_NAME} site package <site-id>                          : create a package for deployment in production of a specific web-site"
+  echo "    ${SCRIPT_NAME} update                                          : update the project in production or dev"
+  echo "    ${SCRIPT_NAME} site update <site-id>                           : update a site in production or dev"
   echo ""
-  echo "= Usage :"
-  echo "========="
-  echo "  ${SCRIPT_NAME} create <project-name> [<project-description>]   : create a multisite drupal project for development. (get the project skeleton from git)"
-  echo "  ${SCRIPT_NAME} deploy (dev | prod)                             : get common composer and npm packages for the project"
-  echo "  ${SCRIPT_NAME} site create <site_id>                           : create a new web-site in the project for development based on the file config/site_id.conf. (create web-site skeleton)"
-  echo "  ${SCRIPT_NAME} site deploy (dev | prod) <site-id>              : get specific composer and npm packages for the website"
-  echo "  ${SCRIPT_NAME} site install (dev|prod) <site-id>               : install a web-site already created for development or production (drupal install of the web-site)"
-  echo "  ${SCRIPT_NAME} site build (dev|prod) <site-id>                 : compil and build a site for frontend in development"
-  echo "  ${SCRIPT_NAME} site fix <site-id>                              : Fix the version of packages (composer and npm) used for this site, usefull for production server, avoid unwanted update of package"
-  echo "  ${SCRIPT_NAME} site unfix <site-id>                            : Unfix the version of packages (composer and npm) used for this site, usefull to try update website package in development"
-  echo "  ${SCRIPT_NAME} fix                                             : as \"site fix\" but for the common packages of the project"
-  echo "  ${SCRIPT_NAME} unfix                                           : as \"site unfix\" but for the common packages of the project"
-  echo "  ${SCRIPT_NAME} list                                            : list all web-site (site-id) in this project"
-  echo "  ${SCRIPT_NAME} package                                         : create a package for deployment in production of a project without web-site."
-  echo "  ${SCRIPT_NAME} site package <site-id>                          : create a package for deployment in production of a specific web-site"
-  echo "  ${SCRIPT_NAME} update                                          : update the project in production or dev"
-  echo "  ${SCRIPT_NAME} site update <site-id>                           : update a site in production or dev"
-  echo ""
-  echo ""
-  echo "= More help :"
-  echo "============="
-  echo "Read install.md in \"docs\" directory for more information"
+  echo "  = More help :"
+  echo "  ============="
+  echo "  Read install.md in \"docs\" directory for more information"
   echo ""
   echo ""
   exit 1
@@ -169,8 +165,11 @@ function create {
   chmod 755 ${SCRIPTS_PATH}/project
 }
 
+#
+# site_create
+#
 function site_create {
-
+  echo ""
 }
 
 #
