@@ -4,8 +4,8 @@ This project is just a **SANDBOX** for the moment. **No stable version is provid
 
  * [The goals](#the-goals-are)
  * [Installation](#installation)
- 
- 
+
+
 ## The goals are
 
 * Provide a Drupal 8 distribution (profile, set of modules, theme, and npm packages) for developers and services companies to develop multi sites Drupal8 / AngularJS2 [ / Ionic 2 ] projects.
