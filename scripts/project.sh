@@ -10,7 +10,7 @@
 #
 VERSION_SCRIPT="0.1.0"
 PHP_VER=5.5.9 #PHP minimum version for drupal
-DRUPAL_ANGULAR_URL=https://github.com/fauconv/indus_drupal8_angular2.git
+DRUPAL_ANGULAR_URL=https://github.com/fauconv/dcf.git
 DRUPAL_ANGULAR_TAG=master
 SCRIPT_NAME=$(basename $0)
 SCRIPTS_PATH=scripts #depth need to be only 1
@@ -77,7 +77,7 @@ function checkPHP {
     echo ""
     exit 1
   fi
-  phpver=`php -v |grep -Eow '^PHP [^ ]+' |gawk '{ print $2 }'`
+  phpver=`php -v |grep -Eow '^PHP [^ ]+' |awk '{ print $2 }'`
   echo "Current PHP version : $phpver"
   if version_gt $PHP_VER $phpver; then
     echo ""
@@ -120,12 +120,12 @@ function deploy {
     echo "Composer install (prod):"
     php ${SCRIPTS_PATH}/composer.phar install --no-dev
     echo "NPM install (prod) :"
-    ${SCRIPTS_PATH}/npm install --only=prod --nodedir=${SCRIPTS_PATH}/bin --prefix=web
+    ${SCRIPTS_PATH}/npm install --only=prod --nodedir=. --prefix=web
   else
     echo "Composer install:"
     php ${SCRIPTS_PATH}/composer.phar install
     echo "NPM install:"
-    ${SCRIPTS_PATH}/npm install --nodedir=${SCRIPTS_PATH}/bin --prefix=web
+    ${SCRIPTS_PATH}/npm install --nodedir=. --prefix=web
   fi
 }
 
@@ -156,13 +156,14 @@ function create {
     rm -rf clone
   fi
   echo "setup project $2..."
-  sed "s|\"name\" *: *\".*\"|\"name\": \"$1\"|" composer.json > composer.json2
-  sed "s|\"name\" *: *\".*\"|\"name\": \"$1\"|" package.json > package.json2
+  project=$(echo $1 | sed "s| |_|")
+  sed "s|\"name\" *: *\".*\"|\"name\": \"${project}\"|" composer.json > composer.json2
+  sed "s|\"name\" *: *\".*\"|\"name\": \"${project}\"|" package.json > package.json2
   sed "s|\"description\" *: *\".*\"|\"description\": \"$2\"|" composer.json2 > composer.json
   sed "s|\"description\" *: *\".*\"|\"description\": \"$2\"|" package.json2 > package.json
   rm composer.json2 package.json2
   rm ${SCRIPT_NAME}
-  chmod 755 ${SCRIPTS_PATH}/project
+  chmod 755 ${SCRIPTS_PATH}/${SCRIPT_NAME}
 }
 
 #
@@ -191,21 +192,22 @@ case $1 in
           deploy "$2"
           ;;
   site )
-          case $2
+          case $2 in
             create )
-                      site_create "$3"
-                      ;;
+                  site_create "$3"
+                  ;;
             deploy )
-                      site_deploy "$3" "$4"
-                      ;;
+                  site_deploy "$3" "$4"
+                  ;;
             install )
-                      site_install "$3" "$4"
-                      ;;
+                  site_install "$3" "$4"
+                  ;;
             * )
-                      echo "unknown command : $1"
-                      showHelp
-                      ;;
+                  echo "unknown command : $1"
+                  showHelp
+                  ;;
           esac
+          ;;
   * )
           echo "unknown command : $1"
           showHelp
