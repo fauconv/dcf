@@ -14,6 +14,7 @@ DRUPAL_ANGULAR_URL=https://github.com/fauconv/dcf.git
 DRUPAL_ANGULAR_TAG=master
 SCRIPT_NAME=$(basename $0)
 SCRIPTS_PATH=scripts #depth need to be only 1
+DOCUMENT_ROOT=web
 
 #
 # showHelp
@@ -147,12 +148,12 @@ function deploy {
     echo "Composer install (prod):"
     php ${SCRIPTS_PATH}/composer.phar install --no-dev
     echo "NPM install (prod) :"
-    ${SCRIPTS_PATH}/npm install --only=prod --nodedir=. --prefix=web
+    ${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   else
     echo "Composer install:"
     php ${SCRIPTS_PATH}/composer.phar install
     echo "NPM install:"
-    ${SCRIPTS_PATH}/npm install --nodedir=. --prefix=web
+    ${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   fi
 }
 
