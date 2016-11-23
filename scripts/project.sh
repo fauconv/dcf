@@ -149,12 +149,15 @@ function deploy {
     php ${SCRIPTS_PATH}/composer.phar install --no-dev
     echo "NPM install (prod) :"
     ${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
+    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="prod" --root="web"
   else
     echo "Composer install:"
     php ${SCRIPTS_PATH}/composer.phar install
     echo "NPM install:"
     ${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
+    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="dev" --root="web"
   fi
+
 }
 
 #
@@ -191,7 +194,7 @@ function create {
   sed "s|\"description\" *: *\".*\"|\"description\": \"$2\"|" package.json2 > package.json
   rm composer.json2 package.json2
   rm ${SCRIPT_NAME}
-  chmod 755 ${SCRIPTS_PATH}/${SCRIPT_NAME}
+  chmod 755 ${SCRIPTS_PATH}/*
 }
 
 #
