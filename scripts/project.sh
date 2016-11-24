@@ -25,9 +25,9 @@ function showHelp {
   echo ""
   echo "  = Usage :"
   echo "  ========="
-  echo "    ${SCRIPT_NAME} create <project-name> [<project-description>]   : create a multisite drupal project for development. (get the project skeleton from git)"
-  echo "    ${SCRIPT_NAME} deploy (dev | prod)                             : get common composer and npm packages for the project"
-  echo "    ${SCRIPT_NAME} site create <site_id>                           : create a new web-site in the project for development based on the file config/site_id.conf. (create web-site skeleton)"
+  echo "    ${SCRIPT_NAME} create (dev | prod) <project-name> [<project-description>]   : create a multisite drupal project for development. (get the project skeleton from git). \"Create\" command automatically perform \"deploy\" command after creation of the projet"
+  echo "    ${SCRIPT_NAME} deploy (dev | prod)                             : get common composer and npm packages for the project. \"site create\" command automatically perform \"site deploy\" command after creation of the projet"
+  echo "    ${SCRIPT_NAME} site create (dev | prod) <site_id>              : create a new web-site in the project for development based on the file config/site_id.conf. (create web-site skeleton)"
   echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site-id>              : get specific composer and npm packages for the website"
   echo "    ${SCRIPT_NAME} site install (dev|prod) <site-id>               : install a web-site already created for development or production (drupal install of the web-site)"
   echo "    ${SCRIPT_NAME} site build (dev|prod) <site-id>                 : compil and build a site for frontend in development"
@@ -66,7 +66,7 @@ function checkGit {
 #
 # vercomp : return true if the first version is newer than the second
 #
-vercomp () {
+function vercomp () {
     if [[ $1 == $2 ]]
     then
         return false
@@ -140,22 +140,35 @@ function checkConposer {
 }
 
 #
+# nodeVersion
+#
+function nodeVersion {
+  echo "Node Version:"
+  ${SCRIPTS_PATH}/node -v
+  echo "NPM Version:"
+  ${SCRIPTS_PATH}/npm -v
+}
+
+#
 # deploy
 #
 function deploy {
   checkConposer
+  nodeVersion
   if [ "$1" = "prod" ]; then
     echo "Composer install (prod):"
-    php ${SCRIPTS_PATH}/composer.phar install --no-dev
+    //php ${SCRIPTS_PATH}/composer.phar install --no-dev
     echo "NPM install (prod) :"
-    ${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
-    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="prod" --root="web"
+    //${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
+    echo "Drupal console init (prod):"
+    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="prod" --root="web" -ny <<< "\n\n"
   else
-    echo "Composer install:"
+    echo "Composer install (dev):"
     php ${SCRIPTS_PATH}/composer.phar install
-    echo "NPM install:"
+    echo "NPM install (dev)"
     ${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
-    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="dev" --root="web"
+    echo "Drupal console init (dev):"
+    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="dev" --root="web" -ny <<< "\n\n"
   fi
 
 }
@@ -164,7 +177,7 @@ function deploy {
 # create
 #
 function create {
-  if [ "$1" = "" ]; then
+  if [ "$2" = "" ]; then
       echo "project's name missing"
       showHelp;
   fi
@@ -187,14 +200,15 @@ function create {
     rm -rf clone
   fi
   echo "setup project $2..."
-  project=$(echo $1 | sed "s| |_|")
+  project=$(echo $2 | sed "s| |_|")
   sed "s|\"name\" *: *\".*\"|\"name\": \"${project}\"|" composer.json > composer.json2
   sed "s|\"name\" *: *\".*\"|\"name\": \"${project}\"|" package.json > package.json2
-  sed "s|\"description\" *: *\".*\"|\"description\": \"$2\"|" composer.json2 > composer.json
-  sed "s|\"description\" *: *\".*\"|\"description\": \"$2\"|" package.json2 > package.json
+  sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
+  sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" package.json2 > package.json
   rm composer.json2 package.json2
   rm ${SCRIPT_NAME}
   chmod 755 ${SCRIPTS_PATH}/*
+  deploy $1
 }
 
 #
@@ -217,7 +231,7 @@ fi
 
 case $1 in
   create )
-          create "$2" "$3"
+          create "$2" "$3" "$4"
           ;;
   deploy )
           deploy "$2"
