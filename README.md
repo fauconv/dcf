@@ -28,19 +28,20 @@ This project is just a **SANDBOX** for the moment. **No stable version is provid
  * Place the script in the root directory of the future project. The document root of websites will be in `web` subdirectory. Exemple : if you place DCF Manager in `/var/www/dcf`, the DOCUMENT_ROOT of your web server must be set to `/var/www/dcf/web`
  * Give execution right to DCF Manager : `chmod 700 project.sh`
  * Launch the installation of DCF with the DCF Manager : `./project.sh create "my project name" "my project description"`
+ * Read [wokflow documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_workflow.md) and [general documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_documentation.md) for more information
 
 
 ## Compatibility
 
 DCF work on :
- * Linux 
+ * Linux
  * Windows 7 + cygwin
  * MacOs X 10
- 
+
 DCF need installation of :
   * PHP 5.5.9 or higher [see drupal's PHP requirements](https://www.drupal.org/docs/7/system-requirements/php)
   * a PHP web server (Apache, IIS...)
   [see drupal's Web Server requirements](https://www.drupal.org/docs/7/system-requirements/web-server)
   * a DataBase server (MySQL, MariaDB...) [see drupal's Database server requirements](https://www.drupal.org/docs/7/system-requirements/database-server)
-  
- 
+
+

@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the exemple intranet feature.
+ */
+
+include_once 'fte_feature_example.features.inc';

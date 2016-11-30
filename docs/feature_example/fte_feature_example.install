@@ -1,0 +1,144 @@
+<?php
+
+/**
+ * Implements hook_install
+ */
+function fte_feature_example_install() {
+
+  /**
+   * Permet d'ajouter un lien ou de mettre a jour un lien lie a une feature
+   * Indispensable pour les intranet car il faut expand les menu créé
+   * @param string or array $paths
+   *    liste des chemins qui doivent etre present avant de creer ou de modifier le lien
+   *     Si il s'agit d'un tableau il peut contenir :
+   *       - une cle "parent_path" :
+   *         Alors le systeme ajoutera ce menu comme parent du menu a creer quand le parent existera
+   *       - une cle "link_path" :
+   *         Alors il s'agit d'une mise a jour de lien existant et on attend que
+   *         le lien existe avant de le modifier.
+   *       - une cle "router_path" et une cle "router" :
+   *         dans ce cas le systeme crera un lien de menu ou "link_path" = "router_path"
+   *         lorsque le router "router" existera et correspondra au router defini pour "router_path
+   * @param string or array $menus
+   *    Contient le nom des menu correspondant a $paths. $menu doit donc etre du
+   *    meme type que $paths et contenir le meme nombres d'element et les meme cle
+   * @param array $item
+   *    un tableau contenant les element du menu (voir menu_item_save()). Si il
+   *    s'agit d'une mise a jour, seul les elements a modifier son necessaire.
+   *
+   * ici exemple de mise a jour d'un lien pour lui ajoute expanded a 1
+   */
+  $item = array('expanded' => 1);
+  $paths = array(
+    'link_path' => 'exemple',
+  );
+  $menus = array(
+    'link_path' => 'main-menu',
+  );
+  ctm_installation_queue_menu_link_save($paths, $menus, $item);
+
+  /**
+   * Permet de désactiver les vues crée par d'autres modules si elles ne sont pas utiliser
+   * @param string $views_to_disable
+   *              Nom de la ou des vues à désactiver
+   */
+  $views_to_disable = array('og_all_user_group_content', 'og_members', 'og_members_admin', 'og_user_groups', 'feeds_log', 'og_nodes');
+  ctm_installation_deactivate_views($views_to_disable);
+
+  /**
+   * Insert ou met à jour les blocs
+   * permet notammant de placer un bloc cree par vues dans une region
+   * @param type $values array(array(field_name string => field_value string))
+   *  les valeurs a stocker
+   * remplace fe_block
+   */
+  $default_theme = variable_get('theme_default');
+  $values = array(
+    array(
+      'module' => 'fte_feature_example',
+      'delta' => 'block_exemple',
+      'theme' => $default_theme,
+      'status' => 1,
+      'weight' => 0,
+      'region' => 'content',
+      'visibility' => 1,
+      'pages' => '',
+      'cache' => DRUPAL_NO_CACHE,
+    )
+  );
+  ctm_installation_insert_or_update_blocs($values);
+}
+
+/**
+ * Implement hook_enable
+ */
+function fte_feature_example_enable() {
+  /**
+   * Creation systematique des regles de clearing du cache des vues au debut du hook_enable de toutes les feature
+   * */
+  $cts = array('ct_name' => '');
+  ctm_installation_queue_add_clean_view_rules('Exemple intranet', $cts, 'fte_feature_example');
+
+  /**
+   * ajoute un content type a la liste des content type interogeable par linkit
+   * @param $ct_name (string) nom machine du content type
+   */
+  ctm_installation_add_ct_to_linkit('exemple_intra'); // ajout a linkit
+
+  /**
+   * ajoute une règle menu position limite par type de contenu
+   * si le $menu_path n'existe pas encore (cas des vue) la demande est mise en
+   * queue pour traitement ulterieur (voir ctm_installation_feature_post_restore)
+   * si la demande peut etre traite elle est retire de la file d attente
+   * @param $title (string) nom machine de la rules a creer
+   * @param $ct_name (string) nom machine du content type limitant la rules
+   * @param $menu_path (string) chemin du menu dans lequel mettre la rules
+   * @param $menu_name (string) nom machine du menu dans lequel mettre la rules
+   */
+  ctm_installation_queue_menu_position_add_rule('exemple', 'exemple', 'main-menu', CTM_MENU_POSITION_CT, 'exemple_intra'); // ajout de la rule menu position
+
+  /**
+   * Ajoute la variable menu_parent_[content_type] si elle pointe vers une url cree par une feature
+   * @param string $ct
+   *              Nom machine du content type qui doit se placer dans ce menu parent
+   * @param string $menu_path
+   *              chemin du parent
+   * @param string $menu_name
+   *              menu du parent
+   */
+  ctm_installation_queue_set_menu_parent('exemple_intra', 'exemple', 'main-menu');
+}
+
+/**
+ * Suppression des regles de clearing du cache des vues
+ * le hook feature post restore de ctm_installation s occupera automatiquement de :
+ * Suppression des content types
+ * Suppression des fields
+ * Suppression des node
+ * Suppresion des terme
+ * Suppression des vocabulaire
+ **/
+function fte_feature_example_disable() {
+  ctm_installation_queue_remove_clean_view_rules('Exemple intranet');
+}
+
+/**
+ * migration fte_feature_example 7.x-1.0 vers 7.x-1.1 :
+ * Explication
+ */
+function fte_feature_example_update_7001(&$sandbox = NULL) {
+  //
+}
+
+/**
+ * Permet d executer l update dans l ordre
+ * 1) les contrib
+ * 2) les modules et feature custom et feature client
+ * combine avec les autre hook du meme type
+ * @return array
+ */
+function fte_feature_example_update_dependencies() {
+  $dependencies = array();
+  ctm_installation_set_dependencies_contrib($dependencies, 'fte_feature_example');
+  return $dependencies;
+}
