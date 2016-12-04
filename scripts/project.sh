@@ -159,10 +159,10 @@ function deploy {
   chmod 750 ${SCRIPTS_PATH}/*
   if [ "$1" = "prod" ]; then
     echo "Composer install (prod):"
-    php ${SCRIPTS_PATH}/composer.phar install --no-dev
+    php ${SCRIPTS_PATH}/composer.phar install --no-dev --no-suggest -vvv --working-dir=.
   else
     echo "Composer install (dev):"
-    php ${SCRIPTS_PATH}/composer.phar install
+    php ${SCRIPTS_PATH}/composer.phar install --no-suggest -o
   fi
   chmod -R 750 ${SCRIPTS_PATH}/*
   nodeVersion
