@@ -14,6 +14,8 @@ DRUPAL_ANGULAR_URL=https://github.com/fauconv/dcf.git
 DRUPAL_ANGULAR_TAG=master
 SCRIPT_NAME=$(basename $0)
 SCRIPTS_PATH=scripts #depth need to be only 1
+CONFIG_PATH=config
+CONFIG_EXT=.config.yml
 DOCUMENT_ROOT=web
 
 #
@@ -168,12 +170,12 @@ function deploy {
     echo "NPM install (prod) :"
     ${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
     echo "Drupal console init (prod):"
-    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="prod" --root="web" -ny <<< "\n\n"
+    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="prod" --root="web" --no-interaction
   else
     echo "NPM install (dev)"
     ${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
     echo "Drupal console init (dev):"
-    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="dev" --root="web" -ny <<< "\n\n"
+    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="dev" --root="web" --no-interaction
   fi
 
 }
@@ -220,7 +222,16 @@ function create {
 # site_create
 #
 function site_create {
-  echo ""
+  config_file=${SCRIPTS_PATH}/${4}${CONFIG_EXT}
+  if [ ! -f ${config_file} ]; then
+    echo ""
+    echo ""
+    echo "file ${config_file} does not exist"
+    echo ""
+    echo ""
+    exit 1
+  fi
+  ${SCRIPTS_PATH}/drupal chain --file=${config_file}
 }
 
 #
@@ -244,7 +255,7 @@ case $1 in
   site )
           case $2 in
             create )
-                  site_create "$3"
+                  site_create "$3" "$4"
                   ;;
             deploy )
                   site_deploy "$3" "$4"
