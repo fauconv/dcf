@@ -9,7 +9,7 @@
 # const
 #
 VERSION_SCRIPT="0.1.0"
-PHP_VER=5.5.9 #PHP minimum version for drupal
+PHP_VER=5.6.9 #PHP minimum version for drupal
 DRUPAL_ANGULAR_URL=https://github.com/fauconv/dcf.git
 DRUPAL_ANGULAR_TAG=master
 SCRIPT_NAME=$(basename $0)
@@ -64,37 +64,37 @@ function checkGit {
 }
 
 #
-# vercomp : return true if the first version is newer than the second
+# vercomp : return 1 if the first version is newer than the second
 #
-function vercomp () {
-    if [[ $1 == $2 ]]
-    then
-        return false
-    fi
-    local IFS=.
-    local i ver1=($1) ver2=($2)
-    # fill empty fields in ver1 with zeros
-    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
-    do
-        ver1[i]=0
-    done
-    for ((i=0; i<${#ver1[@]}; i++))
-    do
-        if [[ -z ${ver2[i]} ]]
-        then
-            # fill empty fields in ver2 with zeros
-            ver2[i]=0
-        fi
-        if ((10#${ver1[i]} > 10#${ver2[i]}))
-        then
-            return true
-        fi
-        if ((10#${ver1[i]} < 10#${ver2[i]}))
-        then
-            return false
-        fi
-    done
-    return 0
+function vercomp {
+  if [[ $1 == $2 ]]
+  then
+      return 0
+  fi
+  local IFS=.
+  local i ver1=($1) ver2=($2)
+  # fill empty fields in ver1 with zeros
+  for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+  do
+      ver1[i]=0
+  done
+  for ((i=0; i<${#ver1[@]}; i++))
+  do
+      if [[ -z ${ver2[i]} ]]
+      then
+          # fill empty fields in ver2 with zeros
+          ver2[i]=0
+      fi
+      if ((10#${ver1[i]} > 10#${ver2[i]}))
+      then
+          return 0
+      fi
+      if ((10#${ver1[i]} < 10#${ver2[i]}))
+      then
+          return 1
+      fi
+  done
+  return 1
 }
 function checkPHP {
   if ! command -v php >/dev/null 2>&1; then
@@ -107,10 +107,10 @@ function checkPHP {
   fi
   phpver=`php -v |grep -Eow '^PHP [^ ]+' |awk '{ print $2 }'`
   echo "Current PHP version : $phpver"
-  if  vercomp $PHP_VER $phpver; then
+  if  vercomp $PHP_VER $phpver ; then
     echo ""
     echo ""
-    echo "php version must $PHP_VER or better"
+    echo "php version must be $PHP_VER or better"
     echo ""
     echo ""
     exit 1
@@ -154,17 +154,22 @@ function nodeVersion {
 #
 function deploy {
   checkConposer
-  nodeVersion
+  chmod 750 ${SCRIPTS_PATH}/*
   if [ "$1" = "prod" ]; then
     echo "Composer install (prod):"
-    //php ${SCRIPTS_PATH}/composer.phar install --no-dev
-    echo "NPM install (prod) :"
-    //${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
-    echo "Drupal console init (prod):"
-    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="prod" --root="web" -ny <<< "\n\n"
+    php ${SCRIPTS_PATH}/composer.phar install --no-dev
   else
     echo "Composer install (dev):"
     php ${SCRIPTS_PATH}/composer.phar install
+  fi
+  chmod -R 750 ${SCRIPTS_PATH}/*
+  nodeVersion
+  if [ "$1" = "prod" ]; then
+    echo "NPM install (prod) :"
+    ${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
+    echo "Drupal console init (prod):"
+    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="prod" --root="web" -ny <<< "\n\n"
+  else
     echo "NPM install (dev)"
     ${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
     echo "Drupal console init (dev):"
@@ -207,7 +212,7 @@ function create {
   sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" package.json2 > package.json
   rm composer.json2 package.json2
   rm ${SCRIPT_NAME}
-  chmod 755 ${SCRIPTS_PATH}/*
+  chmod 750 ${SCRIPTS_PATH}/*
   deploy $1
 }
 
