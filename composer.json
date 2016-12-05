@@ -12,7 +12,7 @@
     ],
     "config": {
         "bin-dir": "scripts",
-        "vendor-dir": "vendor"
+        "vendor-dir": "vendor",
         "bin-compat": "full"
         
     },
