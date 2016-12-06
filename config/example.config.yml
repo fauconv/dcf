@@ -8,8 +8,15 @@ commands:
         db-user: user
         db-pass: pass
         db-port: '3306'
-        site-name: 'Site Name'
-        site-mail: admin@example.com
+        uri: 'http://localhost'
+
+        site-name: '%{{name}}'
+        site-mail: %{{mail}}
+        account-name: %{{name_user}}
+        account-mail: %{{mail_user}}
+        account-pass: '%{{pass}}'
+        langcode: %{{lang}}
     arguments:
-        profile: standard
-## uri + directory a mettre + lang
+      profile: '%{{profile}}'
+
+## site name + site mail  + directory a mettre + lang

@@ -61,6 +61,10 @@ nbproject/**/*
 /test/**/*
 
 # Drupal package from composer
+/config/*.config.yml
+!/config/example.config.yml
+/scripts/*
+!/scripts/project.sh
 /web/.*
 /web/core/**/*
 /web/core/*
