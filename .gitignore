@@ -70,6 +70,7 @@ nbproject/**/*
 /web/index.php
 /web/robots.txt
 /web/sites/development.services.yml
+/web/sites/example.*
 /web/update.php
 /web/web.config
 /web/modules/contrib
