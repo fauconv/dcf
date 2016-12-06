@@ -1,0 +1,15 @@
+## YAML Template.
+commands:
+  - command: 'site:install'
+    options:
+        db-type: mysql
+        db-host: 127.0.0.1
+        db-name: drupal
+        db-user: user
+        db-pass: pass
+        db-port: '3306'
+        site-name: 'Site Name'
+        site-mail: admin@example.com
+    arguments:
+        profile: standard
+## uri + directory a mettre + lang
