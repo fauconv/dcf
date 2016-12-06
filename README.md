@@ -29,7 +29,7 @@ This project is just a **SANDBOX** for the moment. **No stable version is provid
      * Or by using wget: `wget https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh` 
      * Or using curl:
 
-```     
+```
 curl -o project.sh https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh
 ```
 
