@@ -25,7 +25,7 @@ This project is just a **SANDBOX** for the moment. **No stable version is provid
 ## Installation
 
  * Download the DCF Manager script:
-     * [ici](https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh) 
+     * [here](https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh) 
      * Or by using wget: `wget https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh` 
      * Or using curl: `curl -o project.sh https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh` 
  * Place the script in the root directory of the future project. The document root of websites will be in `web` subdirectory. Exemple : if you place DCF Manager in `/var/www/dcf`, the DOCUMENT_ROOT of your web server must be set to `/var/www/dcf/web`
