@@ -15,7 +15,8 @@ DRUPAL_ANGULAR_TAG=master
 SCRIPT_NAME=$(basename $0)
 SCRIPTS_PATH=scripts #depth need to be only 1
 CONFIG_PATH=config
-CONFIG_EXT=.config.yml
+CONFIG_CONF=.config.conf
+CONFIG_YML=.config.yml
 DOCUMENT_ROOT=web
 
 #
@@ -185,6 +186,8 @@ function deploy {
 #
 function create {
   if [ "$2" = "" ]; then
+      echo ""
+      echo ""
       echo "project's name missing"
       showHelp;
   fi
@@ -222,7 +225,22 @@ function create {
 # site_create
 #
 function site_create {
-  config_file=${SCRIPTS_PATH}/${4}${CONFIG_EXT}
+  if [ $2 = "" ]; then
+      echo ""
+      echo ""
+      echo "Site id missing"
+      showHelp;   
+  fi
+  ID=`echo $2 | sed 's|[^a-z]+||g'`
+  if [ $ID = "" ]; then
+      echo ""
+      echo ""
+      echo "site id can only contain lowercase a-z"
+      echo ""
+      echo ""
+  fi 
+  conf_file=${CONFIG_PATH}/${ID}${CONF_EXT}
+  yml_file=${CONFIG_PATH}/${ID}${YML_EXT}
   if [ ! -f ${config_file} ]; then
     echo ""
     echo ""
@@ -231,7 +249,7 @@ function site_create {
     echo ""
     exit 1
   fi
-  ${SCRIPTS_PATH}/drupal chain --file=${config_file}
+  ${SCRIPTS_PATH}/drupal chain --file=${config_yml}
 }
 
 #
