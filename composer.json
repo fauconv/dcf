@@ -1,7 +1,7 @@
 {
-    "name": "Drupal Custom Factory",
+    "name": "dcf",
     "version": "0.1.0",
-    "description": "Drupal 8 distribution for Angular 2",
+    "description": "Drupal Custom Factory",
     "type": "project",
     "license": "GPL-3.0+",
     "authors": [
@@ -13,8 +13,10 @@
     "config": {
         "bin-dir": "scripts",
         "vendor-dir": "vendor",
-        "bin-compat": "full"
-        
+        "bin-compat": "full",
+        "home": ".",
+        "cache-dir": "cache",
+        "data-dir": "composer" 
     },
     "repositories": [
         {
@@ -24,22 +26,22 @@
     ],
     "require": {
         "php" : "^5.5.9 || ^7.0",
-        "ext-gd" : "^5.5.9 || ^7.0",
+        "ext-gd" : "*",
         "ext-json" : "^1.2",
-        "ext-pcre" : "^5.5.9 || ^7.0",
+        "ext-pcre" : "*",
         "ext-hash" : "^1.0",
-        "ext-ctype" : "^5.5.9 || ^7.0",
+        "ext-ctype" : "*",
         "ext-dom" : "*",
-        "ext-date" : "^5.5.9 || ^7.0",
+        "ext-date" : "*",
         "ext-fileinfo" : "^1.0",
-        "ext-filter" : "^5.5.9 || ^7.0",
-        "ext-pdo_mysql" : "^5.5.9 || ^7.0",
-        "ext-session" : "^5.5.9 || ^7.0",
-        "ext-SimpleXML" : "^5.5.9 || ^7.0",
-        "ext-SPL" : "^5.5.9 || ^7.0",
-        "ext-tokenizer" : "^5.5.9 || ^7.0",
-        "ext-xml" : "^5.5.9 || ^7.0",
-        "ext-Zend-OPcache" : "^5.5.9 || ^7.0",
+        "ext-filter" : "*",
+        "ext-pdo_mysql" : "*",
+        "ext-session" : "*",
+        "ext-SimpleXML" : "*",
+        "ext-SPL" : "*",
+        "ext-tokenizer" : "*",
+        "ext-xml" : "*",
+        "ext-Zend-OPcache" : "*",
         
         "mouf/nodejs-installer": "^1.0",
         "composer/installers": "^1.0.20",

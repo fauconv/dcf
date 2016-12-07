@@ -9,7 +9,6 @@
 # const
 #
 VERSION_SCRIPT="0.1.0"
-PHP_VER=5.6.9 #PHP minimum version for drupal
 DRUPAL_ANGULAR_URL=https://github.com/fauconv/dcf.git
 DRUPAL_ANGULAR_TAG=master
 SCRIPT_NAME=$(basename $0)
@@ -29,7 +28,9 @@ function showHelp {
   echo "  = Usage :"
   echo "  ========="
   echo "    ${SCRIPT_NAME} create (dev | prod) <project-name> [<project-description>]   : create a multisite drupal project for development. (get the project skeleton from git). \"Create\" command automatically perform \"deploy\" command after creation of the projet"
-  echo "    ${SCRIPT_NAME} deploy (dev | prod)                             : get common composer and npm packages for the project. \"site create\" command automatically perform \"site deploy\" command after creation of the projet"
+  echo "                                                                     => need git and internet access"
+  echo "    ${SCRIPT_NAME} deploy (dev | prod)                             : get common composer and npm packages for the project."
+  echo "                                                                     => need internet access"
   echo "    ${SCRIPT_NAME} site create (dev | prod) <site_id>              : create a new web-site in the project for development based on the file config/site_id.conf. (create web-site skeleton)"
   echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site-id>              : get specific composer and npm packages for the website"
   echo "    ${SCRIPT_NAME} site install (dev|prod) <site-id>               : install a web-site already created for development or production (drupal install of the web-site)"
@@ -60,85 +61,10 @@ function checkGit {
     echo ""
     echo ""
     echo "git must be installed and define in the \$PATH variable"
+    echo "You can directly get DCF on github: ${DRUPAL_ANGULAR_URL}"
     echo ""
     echo ""
     exit 1
-  fi
-}
-
-#
-# vercomp : return 1 if the first version is newer than the second
-#
-function vercomp {
-  if [[ $1 == $2 ]]
-  then
-      return 0
-  fi
-  local IFS=.
-  local i ver1=($1) ver2=($2)
-  # fill empty fields in ver1 with zeros
-  for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
-  do
-      ver1[i]=0
-  done
-  for ((i=0; i<${#ver1[@]}; i++))
-  do
-      if [[ -z ${ver2[i]} ]]
-      then
-          # fill empty fields in ver2 with zeros
-          ver2[i]=0
-      fi
-      if ((10#${ver1[i]} > 10#${ver2[i]}))
-      then
-          return 0
-      fi
-      if ((10#${ver1[i]} < 10#${ver2[i]}))
-      then
-          return 1
-      fi
-  done
-  return 1
-}
-function checkPHP {
-  if ! command -v php >/dev/null 2>&1; then
-    echo ""
-    echo ""
-    echo "php must be installed and define in the \$PATH variable"
-    echo ""
-    echo ""
-    exit 1
-  fi
-  phpver=`php -v |grep -Eow '^PHP [^ ]+' |awk '{ print $2 }'`
-  echo "Current PHP version : $phpver"
-  if  vercomp $PHP_VER $phpver ; then
-    echo ""
-    echo ""
-    echo "php version must be $PHP_VER or better"
-    echo ""
-    echo ""
-    exit 1
-  fi
-}
-
-#
-# checkComposer
-#
-function checkConposer {
-  echo "CheckComposer:"
-  if [ ! -f "composer.json" ]; then
-    echo ""
-    echo ""
-    echo "You must create a project first"
-    echo ""
-    echo ""
-    exit 1
-  fi
-  if [ ! -f "${SCRIPTS_PATH}/composer.phar" ]; then
-    cd ${SCRIPTS_PATH}
-    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-    php composer-setup.php
-    rm composer-setup.php
-    cd ..
   fi
 }
 
@@ -156,29 +82,24 @@ function nodeVersion {
 # deploy
 #
 function deploy {
-  checkConposer
+  export COMPOSER_HOME=.
   chmod 750 ${SCRIPTS_PATH}/*
   if [ "$1" = "prod" ]; then
     echo "Composer install (prod):"
-    php ${SCRIPTS_PATH}/composer.phar install --no-dev --no-suggest -vvv --working-dir=.
+    php ${SCRIPTS_PATH}/composer.phar install --no-dev --no-suggest
   else
     echo "Composer install (dev):"
-    php ${SCRIPTS_PATH}/composer.phar install --no-suggest -o
+    php ${SCRIPTS_PATH}/composer.phar install --no-suggest -o --apcu-autoloader
   fi
   chmod -R 750 ${SCRIPTS_PATH}/*
   nodeVersion
   if [ "$1" = "prod" ]; then
-    echo "NPM install (prod) :"
-    ${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
-    echo "Drupal console init (prod):"
-    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="prod" --root="web" --no-interaction
+    #echo "NPM install (prod) :"
+    #${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   else
-    echo "NPM install (dev)"
-    ${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
-    echo "Drupal console init (dev):"
-    ${SCRIPTS_PATH}/drupal init --destination=. --override --env="dev" --root="web" --no-interaction
+    #echo "NPM install (dev)"
+    #${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   fi
-
 }
 
 #

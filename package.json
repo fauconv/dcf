@@ -1,7 +1,7 @@
 {
-    "name": "Drupal Custom Factory",
+    "name": "dcf",
     "version": "1.0.0",
-    "description": "Drupal 8 distribution for Angular 2#",
+    "description": "Drupal Custom Factory",
     "type": "project",
     "license": "GPL-3.0+",
     "author": "FauconV",
@@ -9,6 +9,9 @@
         "tsc": "tsc",
         "tsc:w": "tsc -w",
         "lint": "tslint ./app/**/*.ts -t verbose"
+    },
+    "config": {
+        "prefix": "./web"
     },
     "dependencies": {
         "@angular/common": "^2.1.2",
