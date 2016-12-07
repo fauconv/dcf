@@ -16,7 +16,9 @@
         "bin-compat": "full",
         "home": ".",
         "cache-dir": "cache",
-        "data-dir": "composer" 
+        "data-dir": "composer",
+        "apcu-autoloader": true,
+        "optimize-autoloader": true
     },
     "repositories": [
         {

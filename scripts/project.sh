@@ -104,7 +104,7 @@ function checkConposer {
 # deploy
 #
 function deploy {
-  checkComposer
+  checkConposer
   export COMPOSER_HOME=.
   chmod 750 ${SCRIPTS_PATH}/*
   if [ "$1" = "prod" ]; then
@@ -112,7 +112,7 @@ function deploy {
     php ${SCRIPTS_PATH}/composer.phar install --no-dev --no-suggest
   else
     echo "Composer install (dev):"
-    php ${SCRIPTS_PATH}/composer.phar install --no-suggest -o --apcu-autoloader
+    php ${SCRIPTS_PATH}/composer.phar install --no-suggest
   fi
   chmod -R 750 ${SCRIPTS_PATH}/*
   nodeVersion
