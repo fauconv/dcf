@@ -79,9 +79,32 @@ function nodeVersion {
 }
 
 #
+# checkComposer
+#
+function checkConposer {
+  echo "CheckComposer:"
+  if [ ! -f "composer.json" ]; then
+    echo ""
+    echo ""
+    echo "You must create a project first"
+    echo ""
+    echo ""
+    exit 1
+  fi
+  if [ ! -f "${SCRIPTS_PATH}/composer.phar" ]; then
+    cd ${SCRIPTS_PATH}
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    php composer-setup.php
+    rm composer-setup.php
+    cd ..
+  fi
+}
+
+#
 # deploy
 #
 function deploy {
+  checkComposer
   export COMPOSER_HOME=.
   chmod 750 ${SCRIPTS_PATH}/*
   if [ "$1" = "prod" ]; then
@@ -93,13 +116,13 @@ function deploy {
   fi
   chmod -R 750 ${SCRIPTS_PATH}/*
   nodeVersion
-  if [ "$1" = "prod" ]; then
+  #if [ "$1" = "prod" ]; then
     #echo "NPM install (prod) :"
     #${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
-  else
+  #else
     #echo "NPM install (dev)"
     #${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
-  fi
+  #fi
 }
 
 #
@@ -112,7 +135,6 @@ function create {
       echo "project's name missing"
       showHelp;
   fi
-  checkPHP
   if [ ! -f "composer.json" ]; then
     if [ -d ".git" ]; then
       echo ""
