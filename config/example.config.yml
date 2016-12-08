@@ -2,21 +2,19 @@
 commands:
   - command: 'site:install'
     options:
-        db-type: mysql
-        db-host: 127.0.0.1
-        db-name: drupal
-        db-user: user
-        db-pass: pass
-        db-port: '3306'
-        uri: 'http://localhost'
+        db-type: '%{{db_type|mysql}}'
+        db-host: '%{{db_host|127.0.0.1}}'
+        db-name: '%{{db_name}}'
+        db-user: '%{{db_user}}'
+        db-pass: '%{{db_password}}'
+        db-port: '%{{db_port|3306}}'
+        uri: '%{{site_uri|http://localhost}}'
 
-        site-name: '%{{name}}'
-        site-mail: %{{mail}}
-        account-name: %{{name_user}}
-        account-mail: %{{mail_user}}
-        account-pass: '%{{pass}}'
-        langcode: %{{lang}}
+        site-name: '%{{{site_name}}'
+        site-mail: '%{{site_mail}}'
+        account-name: '${{ADMIN_NAME}}'
+        account-mail: '%{{admin_mail}}'
+        langcode: '%{{site_lang}}'
     arguments:
-      profile: '%{{profile}}'
+      profile: '${{SITE_PROFIL}}'
 
-## site name + site mail  + directory a mettre + lang
