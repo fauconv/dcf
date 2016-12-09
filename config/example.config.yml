@@ -10,11 +10,11 @@ commands:
         db-port: '%{{db_port|3306}}'
         uri: '%{{site_uri|http://localhost}}'
 
-        site-name: '%{{{site_name}}'
-        site-mail: '%{{site_mail}}'
+        site-name: '${{{site_name}}'
+        site-mail: '${{site_mail}}'
         account-name: '${{ADMIN_NAME}}'
-        account-mail: '%{{admin_mail}}'
-        langcode: '%{{site_lang}}'
+        account-mail: '${{admin_mail}}'
+        langcode: '${{site_lang}}'
     arguments:
       profile: '${{SITE_PROFIL}}'
 

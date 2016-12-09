@@ -1,7 +1,7 @@
 {
     "name": "dcf",
     "version": "0.1.0",
-    "description": "Drupal Custom Factory",
+    "description": "",
     "type": "project",
     "license": "GPL-3.0+",
     "authors": [
@@ -50,9 +50,9 @@
         "cweagans/composer-patches": "^1.0",
         "drupal-composer/drupal-scaffold": "^2.0.1",
         "drupal/core": "~8.0",
-        "drupal/console": "^1.0",
         "drupal/admin_menu": "3.x-dev",
-        "drupal/composer_manager": "1.x-dev"
+        "drupal/composer_manager": "1.x-dev",
+        "drush/drush": "^8.1"
     },
     "require-dev": {
         "behat/mink": "~1.7",

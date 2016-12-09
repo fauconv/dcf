@@ -23,6 +23,8 @@ LOCAL_CONF=.config.local.conf
 YML_CONF=.config.yml
 DOCUMENT_ROOT=web
 EXAMPLE=example
+ADMIN_NAME=developer
+SITE_PROFIL=internet
 
 #
 # showHelp
@@ -33,11 +35,12 @@ function showHelp {
   echo ""
   echo "  = Usage :"
   echo "  ========="
-  echo "    ${SCRIPT_NAME} get                                             : get the project skeleton from git."
+  echo "    ${SCRIPT_NAME} get                                             : get the project skeleton from gitHub."
   echo "                                                                     => need git and internet access"
-  echo "    ${SCRIPT_NAME} create (dev | prod) <name> [description]        : get common packages for the project and create project name."
+  echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : get common packages for the project and set project name."
   echo "                                                                     => need internet access"
-  echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id>              : create or install (if always exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
+  echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id> [--intranet] : create or install (if always exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
+  echo "                                                                     If --intranet is set, intranet profil is used, else internet profil is used.
   echo "    ${SCRIPT_NAME} site rebuild (dev | prod) <site-id>             : compil and build a site for frontend in development"
   echo "    ${SCRIPT_NAME} site fix <site-id>                              : Fix packages version (composer and npm) used for this site, usefull for production server, avoid unwanted update of package"
   echo "    ${SCRIPT_NAME} site unfix <site-id>                            : Unfix packages version (composer and npm) used for this site, usefull to try update website package in development"
@@ -64,10 +67,8 @@ function showHelp {
 function checkGit {
   if ! command -v git >/dev/null 2>&1; then
     echo ""
-    echo ""
-    echo "git must be installed and define in the \$PATH variable"
+    echo -e "\e[31m\e[1mGit must be installed and define in the \$PATH variable !\e[0m"
     echo "You can directly get DCF on github: ${DRUPAL_ANGULAR_URL}"
-    echo ""
     echo ""
     exit 1
   fi
@@ -77,10 +78,11 @@ function checkGit {
 # nodeVersion
 #
 function nodeVersion {
-  echo "Node Version:"
+  echo -n "Node version "
   ${SCRIPTS_PATH}/node -v
-  echo "NPM Version:"
+  echo -n "NPM version "
   ${SCRIPTS_PATH}/npm -v
+  php ${SCRIPTS_PATH}/composer.phar -V
 }
 
 #
@@ -90,9 +92,7 @@ function checkConposer {
   echo "CheckComposer:"
   if [ ! -f "composer.json" ]; then
     echo ""
-    echo ""
-    echo "You must create a project first"
-    echo ""
+    echo -e "\e[31m\e[1m[You must create a project first !\e[0m"
     echo ""
     exit 1
   fi
@@ -106,13 +106,12 @@ function checkConposer {
 }
 
 #
-# create
+# deploy
 #
-function create {
-  f [ "$2" = "" ]; then
+function deploy {
+  if [ "$2" = "" ]; then
       echo ""
-      echo ""
-      echo "project's name missing"
+      echo -e "\e[31m\e[1mProject's name missing !\e[0m"
       showHelp;
   fi
   echo "setup project $2..."
@@ -122,7 +121,6 @@ function create {
   sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
   sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" package.json2 > package.json
   rm composer.json2 package.json2
-  rm ${SCRIPT_NAME}
   chmod 750 ${SCRIPTS_PATH}/*
   checkConposer
   export COMPOSER_HOME=.
@@ -130,9 +128,11 @@ function create {
   if [ "$1" = "prod" ]; then
     echo "Composer install (prod):"
     php ${SCRIPTS_PATH}/composer.phar install --no-dev --no-suggest
+    php ${SCRIPTS_PATH}/composer.phar update --no-dev --no-suggest
   else
     echo "Composer install (dev):"
     php ${SCRIPTS_PATH}/composer.phar install --no-suggest
+    php ${SCRIPTS_PATH}/composer.phar update --no-suggest
   fi
   chmod -R 750 ${SCRIPTS_PATH}/*
   nodeVersion
@@ -152,9 +152,7 @@ function get {
   if [ ! -f "composer.json" ]; then
     if [ -d ".git" ]; then
       echo ""
-      echo ""
-      echo "Can not get DCF from an existing git directory"
-      echo ""
+      echo -e "\e[31m\e[1mCan not get DCF from an existing git directory !\e[0m"
       echo ""
       exit 1
     fi
@@ -165,46 +163,65 @@ function get {
     mv clone/* . 2> /dev/null
     mv clone/.* . 2> /dev/null
     rm -rf clone
+    rm ${SCRIPT_NAME}
   else
     echo ""
-    echo ""
-    echo "Nothing to doo"
-    echo ""
+    echo -e "Nothing to do"
     echo ""
   fi
 }
 
 #
-# site_create
+# site_deploy
 #
-function site_create {
+function site_deploy {
   if [ $2 = "" ]; then
       echo ""
-      echo ""
-      echo "Site id missing"
+      echo -e "\e[31m\e[1mSite id missing !\e[0m"
       showHelp;   
   fi
   ID=`echo $2 | sed 's|[^a-z]+||g'`
   if [ $ID = "" ]; then
       echo ""
+      echo -e "\e[31m\e[1mSite id can only contain lowercase !\e[0m"
       echo ""
-      echo "site id can only contain lowercase a-z"
-      echo ""
-      echo ""
+      exit 1
   fi 
   global_file=${CONFIG_PATH}/${ID}${GLOBAL_CONF}
   local_file=${CONFIG_PATH}/${ID}${LOCAL_CONF}
   yml_file=${CONFIG_PATH}/${ID}${YML_CONF}
-  if(
   if [ ! -f ${yml_file} ]; then
+    if  ! -f ${CONFIG_PATH}/${EXAMPLE}${YML_CONF} ]; then
+      echo ""
+      echo -e "\e[31m\e[1mFile ${CONFIG_PATH}/${EXAMPLE}${YML_CONF} no longer exist, recreate it from gitHub !\e[0m"
+      echo ""
+      exit 1     
+    fi
     cp ${CONFIG_PATH}/${EXAMPLE}${YML_CONF} ${yml_file}
   fi
-  if [ ! -f ${yml_file} ]; then
-    ${SCRIPTS_PATH}/drupal chain --file=${yml_file}
-  else
-    ${SCRIPTS_PATH}/drupal chain --file=${yml_file}
+  if [ ! -f ${global_file} ]; then
+    echo ""
+    echo -e "\e[31m\e[1mFile ${global_file} is missing\e[0m"
+    echo ""
+    cp ${CONFIG_PATH}/${EXAMPLE}${GLOBAL_CONF} ${global_file}
+    exit 1
   fi
-
+  source ${global}
+  if [ $site_name="" ]; then
+    echo ""
+    echo -e "\e[31m\e[1mFile ${global_file} is empty\e[0m"
+    echo ""
+    exit 1
+  fi
+  if [ $3=="--intranet"] {
+    $SITE_PROFIL=intranet
+  }
+  ${SCRIPTS_PATH}/drupal init --destination="." -n
+  if [! -f ${global_file} ]; then
+    ${SCRIPTS_PATH}/drupal chain --file=${yml_file}
+  else 
+    ${SCRIPTS_PATH}/drupal chain --file=${yml_file} --placeholder="db_type: $db_type"
+  fi
 }
 
 #
@@ -218,30 +235,31 @@ if [ ! "$1" = "create" ]; then
     cd ..
 fi
 
-case $1 in
-  create )
-          create "$2" "$3" "$4"
+case $1 in 
+  deploy )
+          deploy "$2" "$3" "$4"
           ;;
   get )
           get
           ;;
   site )
           case $2 in
-                  ;;
             deploy )
-                  site_deploy "$3" "$4"
+                  site_deploy "$3" "$4" "$5"
                   ;;
             rebuild )
                   site_rebuild "$3" "$4"
                   ;;
             * )
-                  echo "unknown command : $1 $2"
+                  echo ""
+                  echo -e "\e[31m\e[1mUnknown command : $1 $2 !\e[0m"
                   showHelp
                   ;;
           esac
           ;;
   * )
-          echo "unknown command : $1"
+          echo ""
+          echo -e "\e[31m\e[1mUnknown command : $1 !\e[0m"
           showHelp
           ;;
 esac
