@@ -25,6 +25,7 @@ DOCUMENT_ROOT=web
 EXAMPLE=example
 ADMIN_NAME=developer
 SITE_PROFIL=internet
+GET=get
 
 #
 # showHelp
@@ -35,12 +36,12 @@ function showHelp {
   echo ""
   echo "  = Usage :"
   echo "  ========="
-  echo "    ${SCRIPT_NAME} get                                             : get the project skeleton from gitHub."
+  echo "    ${SCRIPT_NAME} ${GET}                                             : get the project skeleton from gitHub."
   echo "                                                                     => need git and internet access"
   echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : get common packages for the project and set project name."
   echo "                                                                     => need internet access"
   echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id> [--intranet] : create or install (if always exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
-  echo "                                                                     If --intranet is set, intranet profil is used, else internet profil is used.
+  echo "                                                                     If --intranet is set, intranet profil is used, else internet profil is used."
   echo "    ${SCRIPT_NAME} site rebuild (dev | prod) <site-id>             : compil and build a site for frontend in development"
   echo "    ${SCRIPT_NAME} site fix <site-id>                              : Fix packages version (composer and npm) used for this site, usefull for production server, avoid unwanted update of package"
   echo "    ${SCRIPT_NAME} site unfix <site-id>                            : Unfix packages version (composer and npm) used for this site, usefull to try update website package in development"
@@ -178,7 +179,7 @@ function site_deploy {
   if [ $2 = "" ]; then
       echo ""
       echo -e "\e[31m\e[1mSite id missing !\e[0m"
-      showHelp;   
+      showHelp;
   fi
   ID=`echo $2 | sed 's|[^a-z]+||g'`
   if [ $ID = "" ]; then
@@ -186,7 +187,7 @@ function site_deploy {
       echo -e "\e[31m\e[1mSite id can only contain lowercase !\e[0m"
       echo ""
       exit 1
-  fi 
+  fi
   global_file=${CONFIG_PATH}/${ID}${GLOBAL_CONF}
   local_file=${CONFIG_PATH}/${ID}${LOCAL_CONF}
   yml_file=${CONFIG_PATH}/${ID}${YML_CONF}
@@ -195,7 +196,7 @@ function site_deploy {
       echo ""
       echo -e "\e[31m\e[1mFile ${CONFIG_PATH}/${EXAMPLE}${YML_CONF} no longer exist, recreate it from gitHub !\e[0m"
       echo ""
-      exit 1     
+      exit 1
     fi
     cp ${CONFIG_PATH}/${EXAMPLE}${YML_CONF} ${yml_file}
   fi
@@ -213,13 +214,13 @@ function site_deploy {
     echo ""
     exit 1
   fi
-  if [ $3=="--intranet"] {
+  if [ $3=="--intranet"]; then
     $SITE_PROFIL=intranet
-  }
+  fi
   ${SCRIPTS_PATH}/drupal init --destination="." -n
   if [! -f ${global_file} ]; then
     ${SCRIPTS_PATH}/drupal chain --file=${yml_file}
-  else 
+  else
     ${SCRIPTS_PATH}/drupal chain --file=${yml_file} --placeholder="db_type: $db_type"
   fi
 }
@@ -231,15 +232,15 @@ cd $(dirname $0)
 if [ "$1" = "" ]; then
     showHelp;
 fi
-if [ ! "$1" = "create" ]; then
+if [ ! "$1" = "${GET}" ]; then
     cd ..
 fi
 
-case $1 in 
+case $1 in
   deploy )
           deploy "$2" "$3" "$4"
           ;;
-  get )
+  ${GET} )
           get
           ;;
   site )
