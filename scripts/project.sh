@@ -163,7 +163,7 @@ function get {
 function deploy {
   if [ "$2" = "" ]; then
       echo ""
-      echo -e "\e[31m\e[1mProject's name missing ! \e[0m "
+      echo -e "\e[31m\e[1mProject's name missing !\e[0m"
       showHelp;
   fi
   echo "setup project $2..."
