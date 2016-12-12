@@ -172,7 +172,7 @@ function deploy {
   if [ ${IS_WINDOW} = true ]; then
     export COMPOSER_HOME=$(pwd)
     echo -e "\e[1;44m\e[1mYou are on Windows you must run this command each time you change the project directory\e[0m"
-    sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${COMPOSER_HOME}/scripts\"|" composer.json > composer.json2
+    sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${COMPOSER_HOME}/scripts/bin\"|" composer.json > composer.json2
     sed "s|\"vendor-dir\": \".*\"|\"vendor-dir\": \"${COMPOSER_HOME}/vendor\"|" composer.json2 > composer.json
     sed "s|\"home\": \".*\"|\"home\": \"${COMPOSER_HOME}\"|" composer.json > composer.json2
     sed "s|\"cache-dir\": \".*\"|\"cache-dir\": \"${COMPOSER_HOME}/cache\"|" composer.json2 > composer.json3
