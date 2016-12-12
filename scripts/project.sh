@@ -109,6 +109,20 @@ function checkConposer {
 }
 
 #
+# check if is windows
+#
+validate_os() {
+  IS_WINDOW=false
+  if [ ! -z $OS ]; then
+    WIN=`echo ${OS} | grep -i Windows`
+    if [ ! -z $WIN ]; then
+      echo "You are on Windows"
+      IS_WINDOW=true
+    fi
+  fi
+}
+
+#
 # get
 #
 function get {
@@ -154,14 +168,26 @@ function deploy {
   fi
   echo "setup project $2..."
   project=$(echo $2 | sed "s| |_|")
-  sed "s|\"name\" *: *\".*\"|\"name\": \"${project}\"|" composer.json > composer.json2
-  sed "s|\"name\" *: *\".*\"|\"name\": \"${project}\"|" package.json > package.json2
-  sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
-  sed "s|\"description\" *: *\".*\"|\"description\": \"$3\"|" package.json2 > package.json
+  validate_os
+  if [ ${IS_WINDOW} = true ]; then
+    export COMPOSER_HOME=$(pwd)
+    echo -e "\e[1;44m\e[1mYou are on Windows you must run this command each time you change the project directory\e[0m"
+    sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${COMPOSER_HOME}/scripts\"|" composer.json > composer.json2
+    sed "s|\"vendor-dir\": \".*\"|\"vendor-dir\": \"${COMPOSER_HOME}/vendor\"|" composer.json2 > composer.json
+    sed "s|\"home\": \".*\"|\"home\": \"${COMPOSER_HOME}\"|" composer.json > composer.json2
+    sed "s|\"cache-dir\": \".*\"|\"cache-dir\": \"${COMPOSER_HOME}/cache\"|" composer.json2 > composer.json3
+    sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/data\"|" composer.json3 > composer.json
+    rm composer.json3
+  else
+    export COMPOSER_HOME=.
+  fi
+  sed "s|^.+\n +\"name\": \".*\"|\"name\": \"${project}\"|" composer.json > composer.json2
+  sed "s|\"name\": \".*\"|\"name\": \"${project}\"|" package.json > package.json2
+  sed "s|\"description\": \".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
+  sed "s|\"description\": \".*\"|\"description\": \"$3\"|" package.json2 > package.json
   rm composer.json2 package.json2
   chmod 750 ${SCRIPTS_PATH}/*
   checkConposer
-  export COMPOSER_HOME=.
   chmod 750 ${SCRIPTS_PATH}/*
   PROD="--no-dev"
   if [ ! "$1" = "prod" ]; then
