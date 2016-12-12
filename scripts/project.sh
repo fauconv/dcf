@@ -103,6 +103,43 @@ function checkConposer {
     php composer-setup.php
     rm composer-setup.php
     cd ..
+  else
+    echo "Composer self install OK"
+  fi
+}
+
+#
+# get
+#
+function get {
+  if [ ! -f "composer.json" ]; then
+    if [ -d ".git" ]; then
+      echo ""
+      echo -e "\e[31m\e[1mCan not get DCF from an existing git directory !\e[0m"
+      echo ""
+      exit 1
+    fi
+    checkGit
+    echo "git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG"
+    git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG clone
+    RETURN=$?
+    if [ ! $RETURN = 0 ]; then
+      echo ""
+      echo -e "\e[31m\e[1mInstallation fail, git cannot retrive component !\e[0m"
+      exit
+    fi
+    rm -rf clone/.git
+    mv clone/* . 2> /dev/null
+    mv clone/.* . 2> /dev/null
+    rm -rf clone
+    rm ${SCRIPT_NAME}
+      echo ""
+      echo "Now use \"${SCRIPT_NAME} deploy (dev | prod) <name> [description]\" to deploy DCF"
+      echo ""
+  else
+    echo ""
+    echo -e "Nothing to do "
+    echo ""
   fi
 }
 
@@ -126,14 +163,19 @@ function deploy {
   checkConposer
   export COMPOSER_HOME=.
   chmod 750 ${SCRIPTS_PATH}/*
-  if [ "$1" = "prod" ]; then
-    echo "Composer install (prod):"
-    php ${SCRIPTS_PATH}/composer.phar install --no-dev --no-suggest
-    php ${SCRIPTS_PATH}/composer.phar update --no-dev --no-suggest
-  else
-    echo "Composer install (dev):"
-    php ${SCRIPTS_PATH}/composer.phar install --no-suggest
-    php ${SCRIPTS_PATH}/composer.phar update --no-suggest
+  PROD="--no-dev"
+  if [ ! "$1" = "prod" ]; then
+    PROD=""
+  fi
+  php ${SCRIPTS_PATH}/composer.phar install $PROD --no-suggest
+  RETURN=$?
+  if [ ! ${RETURN} = 0 ]; then
+    exit 1
+  fi
+  php ${SCRIPTS_PATH}/composer.phar update $PROD --no-suggest
+  RETURN=$?
+  if [ ! ${RETURN} = 0 ]; then
+    exit 1
   fi
   chmod -R 750 ${SCRIPTS_PATH}/*
   nodeVersion
@@ -144,32 +186,7 @@ function deploy {
     #echo "NPM install (dev)"
     #${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   #fi
-}
 
-#
-# get
-#
-function get {
-  if [ ! -f "composer.json" ]; then
-    if [ -d ".git" ]; then
-      echo ""
-      echo -e "\e[31m\e[1mCan not get DCF from an existing git directory !\e[0m"
-      echo ""
-      exit 1
-    fi
-    checkGit
-    echo "git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG"
-    git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG clone
-    rm -rf clone/.git
-    mv clone/* . 2> /dev/null
-    mv clone/.* . 2> /dev/null
-    rm -rf clone
-    rm ${SCRIPT_NAME}
-  else
-    echo ""
-    echo -e "Nothing to do"
-    echo ""
-  fi
 }
 
 #
