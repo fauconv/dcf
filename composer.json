@@ -11,7 +11,7 @@
         }
     ],
     "config": {
-        "bin-dir": "bin",
+        "bin-dir": "scripts",
         "vendor-dir": "vendor",
         "bin-compat": "full",
         "home": ".",

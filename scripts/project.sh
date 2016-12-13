@@ -15,16 +15,25 @@
 VERSION_SCRIPT="0.1.0"
 DRUPAL_ANGULAR_URL=https://github.com/fauconv/dcf.git
 DRUPAL_ANGULAR_TAG=master
-SCRIPT_NAME=$(basename $0)
-SCRIPTS_PATH=scripts #depth need to be only 1
-CONFIG_PATH=config
+
+#dcf file names
 GLOBAL_CONF=.config.global.conf
 LOCAL_CONF=.config.local.conf
 YML_CONF=.config.yml
-DOCUMENT_ROOT=web
 EXAMPLE=example
+
+#DCF paths
+SCRIPT_NAME=$(basename $0)
+SCRIPTS_PATH=scripts #depth need to be only 1
+CONFIG_PATH=config
+DOCUMENT_ROOT=web
+VENDOR_PATH=vendor
+
+#admin user
 ADMIN_NAME=developer
 SITE_PROFIL=internet
+
+#other
 GET=get
 
 #
@@ -36,11 +45,11 @@ function showHelp {
   echo ""
   echo "  = Usage :"
   echo "  ========="
-  echo "    ${SCRIPT_NAME} ${GET}                                             : get the project skeleton from gitHub."
+  echo "    ${SCRIPT_NAME} ${GET}                                             : get DCF (project skeleton) from gitHub."
   echo "                                                                     => need git and internet access"
-  echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : get common packages for the project and set project name."
+  echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : deploy DCF -> get common packages for the project and set project name."
   echo "                                                                     => need internet access"
-  echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id> [--intranet] : create or install (if always exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
+  echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id> [--intranet] : create or install (if already exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
   echo "                                                                     If --intranet is set, intranet profil is used, else internet profil is used."
   echo "    ${SCRIPT_NAME} site rebuild (dev | prod) <site-id>             : compil and build a site for frontend in development"
   echo "    ${SCRIPT_NAME} site fix <site-id>                              : Fix packages version (composer and npm) used for this site, usefull for production server, avoid unwanted update of package"
@@ -116,7 +125,6 @@ validate_os() {
   if [ ! -z $OS ]; then
     WIN=`echo ${OS} | grep -i Windows`
     if [ ! -z $WIN ]; then
-      echo "You are on Windows"
       IS_WINDOW=true
     fi
   fi
@@ -159,6 +167,7 @@ function get {
 
 #
 # deploy
+# TODO : change part of it in composer plugin
 #
 function deploy {
   if [ "$2" = "" ]; then
@@ -170,17 +179,18 @@ function deploy {
   project=$(echo $2 | sed "s| |_|")
   validate_os
   if [ ${IS_WINDOW} = true ]; then
+    #correct bug of composer + cygwin on windows
     export COMPOSER_HOME=$(pwd)
     echo -e "\e[1;44m\e[1mYou are on Windows you must run this command each time you change the project directory\e[0m"
-    sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${COMPOSER_HOME}/scripts/bin\"|" composer.json > composer.json2
-    sed "s|\"vendor-dir\": \".*\"|\"vendor-dir\": \"${COMPOSER_HOME}/vendor\"|" composer.json2 > composer.json
-    sed "s|\"home\": \".*\"|\"home\": \"${COMPOSER_HOME}\"|" composer.json > composer.json2
-    sed "s|\"cache-dir\": \".*\"|\"cache-dir\": \"${COMPOSER_HOME}/cache\"|" composer.json2 > composer.json3
-    sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/data\"|" composer.json3 > composer.json
     rm composer.json3
   else
     export COMPOSER_HOME=.
   fi
+  sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${COMPOSER_HOME}/${SCRIPTS_PATH}\"|" composer.json > composer.json2
+  sed "s|\"vendor-dir\": \".*\"|\"vendor-dir\": \"${COMPOSER_HOME}/${VENDOR_PATH}\"|" composer.json2 > composer.json
+  sed "s|\"home\": \".*\"|\"home\": \"${COMPOSER_HOME}\"|" composer.json > composer.json2
+  sed "s|\"cache-dir\": \".*\"|\"cache-dir\": \"${COMPOSER_HOME}/cache\"|" composer.json2 > composer.json3
+  sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/composer\"|" composer.json3 > composer.json
   sed "s|^.+\n +\"name\": \".*\"|\"name\": \"${project}\"|" composer.json > composer.json2
   sed "s|\"name\": \".*\"|\"name\": \"${project}\"|" package.json > package.json2
   sed "s|\"description\": \".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
@@ -204,7 +214,13 @@ function deploy {
     exit 1
   fi
   chmod -R 750 ${SCRIPTS_PATH}/*
-  nodeVersion
+  if [ ${IS_WINDOW} = true ]; then
+    #correct bug of php + cygwin on windows
+    sed "s|return require __DIR__.*|return require __DIR__/../${VENDOR_PATH}/autoload.php|" ${DOCUMENT_ROOT}/autoload.php > ${DOCUMENT_ROOT}/autoload.php2
+    rm ${DOCUMENT_ROOT}/autoload.php
+    mv ${DOCUMENT_ROOT}/autoload.php2 ${DOCUMENT_ROOT}/autoload.php
+  fi
+  #nodeVersion
   #if [ "$1" = "prod" ]; then
     #echo "NPM install (prod) :"
     #${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
