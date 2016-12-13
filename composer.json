@@ -47,8 +47,10 @@
         "cweagans/composer-patches": "^1.0",
         "drupal-composer/drupal-scaffold": "^2.0.1",
         "drupal/core": "~8.0",
-        "drupal/admin_menu": "3.x-dev",
+        "drupal/admin_toolbar": "*",
         "drupal/composer_manager": "1.x-dev",
+        "drupal/module_filter": "*",
+        "drupal/menu_admin_per_menu": "*",
         "drush/drush": "^8.1"
     },
     "require-dev": {
