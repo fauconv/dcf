@@ -1,0 +1,14 @@
+{
+    "require": {
+        "mouf/nodejs-installer": "^1.0"
+    },
+    "extra": {
+        "mouf": {
+            "nodejs": {
+                "version": "*",
+                "targetDir": "scripts",
+                "forceLocal": true
+            }
+        }
+    }
+}
