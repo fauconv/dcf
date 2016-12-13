@@ -182,20 +182,19 @@ function deploy {
     #correct bug of composer + cygwin on windows
     export COMPOSER_HOME=$(pwd)
     echo -e "\e[1;44m\e[1mYou are on Windows you must run this command each time you change the project directory\e[0m"
-    rm composer.json3
   else
     export COMPOSER_HOME=.
   fi
   sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${COMPOSER_HOME}/${SCRIPTS_PATH}\"|" composer.json > composer.json2
   sed "s|\"vendor-dir\": \".*\"|\"vendor-dir\": \"${COMPOSER_HOME}/${VENDOR_PATH}\"|" composer.json2 > composer.json
   sed "s|\"home\": \".*\"|\"home\": \"${COMPOSER_HOME}\"|" composer.json > composer.json2
-  sed "s|\"cache-dir\": \".*\"|\"cache-dir\": \"${COMPOSER_HOME}/cache\"|" composer.json2 > composer.json3
-  sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/composer\"|" composer.json3 > composer.json
-  sed "s|^.+\n +\"name\": \".*\"|\"name\": \"${project}\"|" composer.json > composer.json2
+  sed "s|\"cache-dir\": \".*\"|\"cache-dir\": \"${COMPOSER_HOME}/cache\"|" composer.json2 > composer.json
+  sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/composer\"|" composer.json > composer.json2
+  sed "s|^.+\n +\"name\": \".*\"|\"name\": \"${project}\"|" composer.json2 > composer.json3
+  sed "s|\"description\": \".*\"|\"description\": \"$3\"|" composer.json3 > composer.json
   sed "s|\"name\": \".*\"|\"name\": \"${project}\"|" package.json > package.json2
-  sed "s|\"description\": \".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
   sed "s|\"description\": \".*\"|\"description\": \"$3\"|" package.json2 > package.json
-  rm composer.json2 package.json2
+  rm composer.json2 package.json2 composer.json3
   chmod 750 ${SCRIPTS_PATH}/*
   checkConposer
   chmod 750 ${SCRIPTS_PATH}/*
@@ -216,7 +215,7 @@ function deploy {
   chmod -R 750 ${SCRIPTS_PATH}/*
   if [ ${IS_WINDOW} = true ]; then
     #correct bug of php + cygwin on windows
-    sed "s|return require __DIR__.*|return require __DIR__/../${VENDOR_PATH}/autoload.php|" ${DOCUMENT_ROOT}/autoload.php > ${DOCUMENT_ROOT}/autoload.php2
+    sed "s|return require __DIR__.*|return require __DIR__ . '/../${VENDOR_PATH}/autoload.php';|" ${DOCUMENT_ROOT}/autoload.php > ${DOCUMENT_ROOT}/autoload.php2
     rm ${DOCUMENT_ROOT}/autoload.php
     mv ${DOCUMENT_ROOT}/autoload.php2 ${DOCUMENT_ROOT}/autoload.php
   fi

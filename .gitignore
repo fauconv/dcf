@@ -32,8 +32,7 @@ coverage
 node_modules
 jspm_packages
 vendor
-composer.lock
-/composer
+composer
 cache
 
 # Optional npm cache directory
