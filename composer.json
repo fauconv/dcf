@@ -11,12 +11,12 @@
         }
     ],
     "config": {
-        "bin-dir": "../scripts",
-        "vendor-dir": "../vendor",
+        "bin-dir": "vendor/bin",
+        "vendor-dir": "vendor",
         "bin-compat": "full",
-        "home": "./composer",
-        "cache-dir": "cache",
-        "data-dir": "data",
+        "home": "composer",
+        "cache-dir": "composer/cache",
+        "data-dir": "composer/data",
         "apcu-autoloader": true,
         "optimize-autoloader": true
     },

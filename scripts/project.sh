@@ -23,12 +23,14 @@ YML_CONF=.config.yml
 EXAMPLE=example
 
 #DCF paths
-SCRIPT_NAME=$(basename $0)
-SCRIPTS_PATH=scripts #depth need to be only 1
-CONFIG_PATH=config
-DOCUMENT_ROOT=web
-VENDOR_PATH=vendor
-DCF_HOME=.
+SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
+ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
+IS_GET=false
+if [ -f ${ABS_SCRIPT_PATH}/dcf_path ]; then
+  source ${ABS_SCRIPT_PATH}/dcf_path
+else
+  IS_GET=true
+fi
 
 #admin user
 ADMIN_NAME=developer
@@ -46,23 +48,26 @@ function showHelp {
   echo ""
   echo "  = Usage :"
   echo "  ========="
-  echo "    ${SCRIPT_NAME} ${GET}                                             : get DCF (project skeleton) from gitHub."
-  echo "                                                                     => need git and internet access"
-  echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : deploy or update DCF -> get or update DCF composer packages for the project and set project name."
-  echo "                                                                     => need internet access"
-  echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id> [--intranet] : create or install (if already exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
-  echo "                                                                     If --intranet is set, intranet profil is used, else internet profil is used."
-  echo "    ${SCRIPT_NAME} site rebuild (dev | prod) <site-id>             : compil and build a site for frontend in development"
-  echo "    ${SCRIPT_NAME} site fix <site-id>                              : Fix packages version (composer and npm) used for this site, usefull for production server, avoid unwanted update of package"
-  echo "    ${SCRIPT_NAME} site unfix <site-id>                            : Unfix packages version (composer and npm) used for this site, usefull to try update website package in development"
-  echo "    ${SCRIPT_NAME} fix                                             : as \"site fix\" but for the common packages of the project"
-  echo "    ${SCRIPT_NAME} unfix                                           : as \"site unfix\" but for the common packages of the project"
-  echo "    ${SCRIPT_NAME} list                                            : list all web-site (site-id) in this project"
-  echo "    ${SCRIPT_NAME} site remove <site-id>                           : remove an web-site (installed or not)"
-  echo "    ${SCRIPT_NAME} package                                         : create a package for deployment in production of a project without web-site."
-  echo "    ${SCRIPT_NAME} site package <site-id>                          : create a package for deployment in production of a specific web-site"
-  echo "    ${SCRIPT_NAME} update                                          : update and rebuild all web-site in production or dev "
-  echo "    ${SCRIPT_NAME} site update <site-id>                           : update and rebuild a web-site in production or dev"
+  if [ $IS_GET=true ]; then
+    echo "    ${SCRIPT_NAME} ${GET}                                          : get DCF (project skeleton) from gitHub."
+    echo "                                                                     => need git and internet access"
+  else
+    echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : deploy or update DCF -> get or update DCF composer packages for the project and set project name."
+    echo "                                                                     => need internet access"
+    echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id> [--intranet] : create or install (if already exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
+    echo "                                                                     If --intranet is set, intranet profil is used, else internet profil is used."
+    echo "    ${SCRIPT_NAME} site rebuild (dev | prod) <site-id>             : compil and build a site for frontend in development"
+    echo "    ${SCRIPT_NAME} site fix <site-id>                              : Fix packages version (composer and npm) used for this site, usefull for production server, avoid unwanted update of package"
+    echo "    ${SCRIPT_NAME} site unfix <site-id>                            : Unfix packages version (composer and npm) used for this site, usefull to try update website package in development"
+    echo "    ${SCRIPT_NAME} fix                                             : as \"site fix\" but for the common packages of the project"
+    echo "    ${SCRIPT_NAME} unfix                                           : as \"site unfix\" but for the common packages of the project"
+    echo "    ${SCRIPT_NAME} list                                            : list all web-site (site-id) in this project"
+    echo "    ${SCRIPT_NAME} site remove <site-id>                           : remove an web-site (installed or not)"
+    echo "    ${SCRIPT_NAME} package                                         : create a package for deployment in production of a project without web-site."
+    echo "    ${SCRIPT_NAME} site package <site-id>                          : create a package for deployment in production of a specific web-site"
+    echo "    ${SCRIPT_NAME} update                                          : update and rebuild all web-site in production or dev "
+    echo "    ${SCRIPT_NAME} site update <site-id>                           : update and rebuild a web-site in production or dev"
+  fi
   echo ""
   echo "  = More help :"
   echo "  ============="
@@ -90,10 +95,10 @@ function checkGit {
 #
 function nodeVersion {
   echo -n "Node version "
-  ${SCRIPTS_PATH}/node -v
+  ${ABS_SCRIPTS_PATH}/node -v
   echo -n "NPM version "
-  ${SCRIPTS_PATH}/npm -v
-  php ${SCRIPTS_PATH}/composer.phar -V
+  ${ABS_SCRIPTS_PATH}/npm -v
+  php ${ABS_SCRIPTS_PATH}/composer.phar -V
 }
 
 #
@@ -107,8 +112,8 @@ function checkConposer {
     echo ""
     exit 1
   fi
-  if [ ! -f "${SCRIPTS_PATH}/composer.phar" ]; then
-    cd ${SCRIPTS_PATH}
+  if [ ! -f "${ABS_SCRIPTS_PATH}/composer.phar" ]; then
+    cd ${ABS_SCRIPTS_PATH}
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
     php composer-setup.php
     rm composer-setup.php
@@ -128,8 +133,6 @@ validate_os() {
     WIN=`echo ${OS} | grep -i Windows`
     if [ ! -z $WIN ]; then
       IS_WINDOW=true
-      export DCF_HOME=$(pwd)
-      echo -e "\e[1;44m\e[1mYou are on Windows you must run this command each time you change the project directory\e[0m"
     fi
   fi
 }
@@ -138,35 +141,29 @@ validate_os() {
 # get
 #
 function get {
-  if [ ! -f "composer.json" ]; then
-    if [ -d ".git" ]; then
-      echo ""
-      echo -e "\e[31m\e[1mCan not get DCF from an existing git directory !\e[0m"
-      echo ""
-      exit 1
-    fi
-    checkGit
-    echo "git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG"
-    git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG clone
-    RETURN=$?
-    if [ ! $RETURN = 0 ]; then
-      echo ""
-      echo -e "\e[31m\e[1mInstallation fail, git cannot retrive component !\e[0m"
-      exit
-    fi
-    rm -rf clone/.git
-    mv clone/* . 2> /dev/null
-    mv clone/.* . 2> /dev/null
-    rm -rf clone
-    rm ${SCRIPT_NAME}
-      echo ""
-      echo "Now use \"${SCRIPTS_PATH}/${SCRIPT_NAME} deploy dev <name> [description]\" to deploy DCF"
-      echo ""
-  else
+  if [ -d ".git" ]; then
     echo ""
-    echo -e "Nothing to do "
+    echo -e "\e[31m\e[1mCan not get DCF from an existing git directory !\e[0m"
     echo ""
+    exit 1
   fi
+  checkGit
+  cd $ABS_SCRIPT_PATH
+  git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG clone
+  RETURN=$?
+  if [ ! $RETURN = 0 ]; then
+    echo ""
+    echo -e "\e[31m\e[1mInstallation fail, git cannot retrive component !\e[0m"
+    exit
+  fi
+  rm -rf clone/.git
+  mv clone/* . 2> /dev/null
+  mv clone/.* . 2> /dev/null
+  rm -rf clone
+  rm ${SCRIPT_NAME}
+  echo ""
+  echo "Now use \"${SCRIPTS_PATH}/${SCRIPT_NAME} deploy dev <project name> [project description]\" to deploy DCF"
+  echo ""
 }
 
 #
@@ -182,17 +179,20 @@ function deploy {
   echo "setup project $2..."
   project=$(echo $2 | sed "s| |_|")
   validate_os
-  export COMPOSER_HOME=${DCF_HOME}/composer
-  sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${DCF_HOME}/${SCRIPTS_PATH}\"|" composer.json > composer.json2
-  sed "s|\"vendor-dir\": \".*\"|\"vendor-dir\": \"${DCF_HOME}/${VENDOR_PATH}\"|" composer.json2 > composer.json
-  sed "s|\"home\": \".*\"|\"home\": \"${COMPOSER_HOME}\"|" composer.json > composer.json2
-  sed "s|\"cache-dir\": \".*\"|\"cache-dir\": \"${COMPOSER_HOME}/cache\"|" composer.json2 > composer.json
-  sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/data\"|" composer.json > composer.json2
-  sed "s|^.+\n +\"name\": \".*\"|\"name\": \"${project}\"|" composer.json2 > composer.json3
-  sed "s|\"description\": \".*\"|\"description\": \"$3\"|" composer.json3 > composer.json
+  cd ${ABS_DCF_PATH}
+  sed "s|^.+\n +\"name\": \".*\"|\"name\": \"${project}\"|" composer.json > composer.json2
+  sed "s|\"description\": \".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
   sed "s|\"name\": \".*\"|\"name\": \"${project}\"|" package.json > package.json2
   sed "s|\"description\": \".*\"|\"description\": \"$3\"|" package.json2 > package.json
-  rm composer.json2 package.json2 composer.json3
+
+  #export COMPOSER_HOME=${DCF_HOME}/composer
+  #sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${DCF_HOME}/${SCRIPTS_PATH}\"|" composer.json > composer.json2
+  #sed "s|\"vendor-dir\": \".*\"|\"vendor-dir\": \"${DCF_HOME}/${VENDOR_PATH}\"|" composer.json2 > composer.json
+  #sed "s|\"home\": \".*\"|\"home\": \"${COMPOSER_HOME}\"|" composer.json > composer.json2
+  #sed "s|\"cache-dir\": \".*\"|\"cache-dir\": \"${COMPOSER_HOME}/cache\"|" composer.json2 > composer.json
+  #sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/data\"|" composer.json > composer.json2
+
+  rm composer.json2 package.json2
   chmod 750 ${SCRIPTS_PATH}/*
   checkConposer
   chmod 750 ${SCRIPTS_PATH}/*
@@ -213,9 +213,9 @@ function deploy {
   chmod -R 750 ${SCRIPTS_PATH}/*
   if [ ${IS_WINDOW} = true ]; then
     #correct bug of php + cygwin on windows
-    sed "s|return require __DIR__.*|return require __DIR__ . '/../${VENDOR_PATH}/autoload.php';|" ${DOCUMENT_ROOT}/autoload.php > ${DOCUMENT_ROOT}/autoload.php2
-    rm ${DOCUMENT_ROOT}/autoload.php
-    mv ${DOCUMENT_ROOT}/autoload.php2 ${DOCUMENT_ROOT}/autoload.php
+    #sed "s|return require __DIR__.*|return require __DIR__ . '/../${VENDOR_PATH}/autoload.php';|" ${DOCUMENT_ROOT}/autoload.php > ${DOCUMENT_ROOT}/autoload.php2
+    #rm ${DOCUMENT_ROOT}/autoload.php
+    #mv ${DOCUMENT_ROOT}/autoload.php2 ${DOCUMENT_ROOT}/autoload.php
   fi
   #nodeVersion
   #if [ "$1" = "prod" ]; then
@@ -282,11 +282,11 @@ function site_deploy {
 #
 # main
 #
-cd $(dirname $0)
 if [ "$1" = "" ]; then
     showHelp;
 fi
 if [ ! "$1" = "${GET}" ]; then
+
     cd ..
 fi
 

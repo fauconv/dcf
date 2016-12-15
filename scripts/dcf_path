@@ -1,0 +1,22 @@
+#!/bin/bash
+#+-----------------------------------------------------------+
+#|                                                           |
+#| all DCF path                                              |
+#|                                                           |
+#+-----------------------------------------------------------+
+#| version : 1                                               |
+#+-----------------------------------------------------------+
+
+CONFIG_PATH=config
+DOCUMENT_ROOT=web
+VENDOR_PATH=vendor
+VENDOR_BIN_PATH=${VENDOR_PATH}/bin
+SCRIPTS_PATH=scripts #depth need to be only 1
+
+ABS_DCF_PATH=$(dirname $ABS_SCRIPT_PATH)
+
+ABS_CONFIG_PATH=${ABS_DCF_PATH}/${CONFIG_PATH}
+ABS_DOCUMENT_ROOT=${ABS_DCF_PATH}/${DOCUMENT_ROOT}
+ABS_VENDOR_PATH=${ABS_DCF_PATH}/${VENDOR_PATH}
+ABS_VENDOR_BIN_PATH=${ABS_DCF_PATH}/${VENDOR_BIN_PATH}}
+ABS_SCRIPTS_PATH=${ABS_DCF_PATH}/${SCRIPTS_PATH}

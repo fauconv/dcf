@@ -24,16 +24,11 @@ coverage
 # node-waf configuration
 .lock-wscript
 
-#drupal console
-/console/*
-/console/**/*
-
 # Dependency directories
 node_modules
 jspm_packages
 vendor
 composer
-cache
 
 # Optional npm cache directory
 .npm
@@ -64,9 +59,8 @@ nbproject/**/*
 
 # Drupal package from composer
 /config/*.config.yml
-!/config/example.config.yml
-/scripts/*
-!/scripts/project.sh
+!/config/example.config.*
+/scripts/composer.phar
 /web/.*
 /web/core/**/*
 /web/core/*
