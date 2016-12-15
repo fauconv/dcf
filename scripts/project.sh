@@ -200,9 +200,13 @@ function deploy {
   if [ ! "$1" = "prod" ]; then
     PROD=""
   fi
-  if(
-  php ${SCRIPTS_PATH}/composer.phar install $PROD --no-suggest
-  RETURN=$?
+  if [ -f "composer.lock" ]; then
+    php ${SCRIPTS_PATH}/composer.phar update $PROD --no-suggest
+    RETURN=$?
+  else
+    php ${SCRIPTS_PATH}/composer.phar install $PROD --no-suggest
+    RETURN=$?
+  fi
   if [ ! ${RETURN} = 0 ]; then
     exit 1
   fi
@@ -221,9 +225,7 @@ function deploy {
     #echo "NPM install (dev)"
     #${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   #fi
-
 }
-
 #
 # site_deploy
 #
