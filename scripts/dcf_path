@@ -2,6 +2,7 @@
 #+-----------------------------------------------------------+
 #|                                                           |
 #| all DCF path                                              |
+#| composer and drush dont like bin dir out of vendor dir    |
 #|                                                           |
 #+-----------------------------------------------------------+
 #| version : 1                                               |
@@ -18,5 +19,5 @@ ABS_DCF_PATH=$(dirname $ABS_SCRIPT_PATH)
 ABS_CONFIG_PATH=${ABS_DCF_PATH}/${CONFIG_PATH}
 ABS_DOCUMENT_ROOT=${ABS_DCF_PATH}/${DOCUMENT_ROOT}
 ABS_VENDOR_PATH=${ABS_DCF_PATH}/${VENDOR_PATH}
-ABS_VENDOR_BIN_PATH=${ABS_DCF_PATH}/${VENDOR_BIN_PATH}}
+ABS_VENDOR_BIN_PATH=${ABS_DCF_PATH}/${VENDOR_BIN_PATH}
 ABS_SCRIPTS_PATH=${ABS_DCF_PATH}/${SCRIPTS_PATH}

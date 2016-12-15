@@ -1,10 +1,7 @@
 #!/bin/bash
 #+-----------------------------------------------------------+
 #|                                                           |
-#| Drush shortcut                                            |
-#|                                                           |
-#| To manage bug in composer                                 |
-#| composer need to have bin directory in vendor             |
+#| pseudo environment for development in DCF                 |
 #|                                                           |
 #+-----------------------------------------------------------+
 #| version : 1                                               |
@@ -15,4 +12,4 @@ SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
 ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 source ${ABS_SCRIPT_PATH}/dcf_path
 
-"${ABS_VENDOR_BIN_PATH}/node" "$@"
+export PATH=${ABS_SCRIPT_PATH}:${ABS_VENDOR_BIN_PATH}:$PATH

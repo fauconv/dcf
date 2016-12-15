@@ -17,9 +17,8 @@ DRUPAL_ANGULAR_URL=https://github.com/fauconv/dcf.git
 DRUPAL_ANGULAR_TAG=master
 
 #dcf file names
-GLOBAL_CONF=.config.global.conf
-LOCAL_CONF=.config.local.conf
-YML_CONF=.config.yml
+GLOBAL_CONF=.config.global.ini
+LOCAL_CONF=.config.local.ini
 EXAMPLE=example
 
 #DCF paths
@@ -152,7 +151,7 @@ function get {
   rm -rf clone
   rm ${SCRIPT_NAME}
   echo ""
-  echo "Now use \"${SCRIPTS_PATH}/${SCRIPT_NAME} deploy dev <project name> [project description]\" to deploy DCF"
+  echo "Now use \"${SCRIPT_NAME} deploy dev <project name> [project description]\" to deploy DCF"
   echo ""
 }
 

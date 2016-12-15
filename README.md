@@ -24,19 +24,23 @@ This project is just a **SANDBOX** for the moment. **No stable version is provid
 
 ## Installation
 
- * Download the DCF Manager script:
-     * [here](https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh) 
-     * Or by using wget: `wget https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh` 
+ 1. Download the DCF Manager script:
+     * [here](https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh)
+     * Or by using wget: `wget https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh`
      * Or using curl:
 
 ```
 curl -o project.sh https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh
 ```
 
- * Place the script in the root directory of the future project. The document root of websites will be in `web` subdirectory. Exemple : if you place DCF Manager in `/var/www/dcf`, the DOCUMENT_ROOT of your web server must be set to `/var/www/dcf/web`
- * Give execution right to DCF Manager : `chmod 700 project.sh`
- * Launch the installation of DCF with the DCF Manager : `./project.sh create "my project name" "my project description"`
- * Read [wokflow documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_workflow.md) and [general documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_documentation.md) for more information
+ 2. Place the script in the root directory of the future project. The document root of websites will be in `web` subdirectory. Exemple : if you place DCF Manager in `/var/www/dcf`, the DOCUMENT_ROOT of your web server must be set to `/var/www/dcf/web`
+ 3. Give execution right to DCF Manager: `chmod 700 project.sh`
+ 4. Download DCF with the DCF Manager: `./project.sh get`
+ 5. Deploy DCF: `./project.sh deploy dev "my project name" "my project description"`
+ 6. Optionaly launch `scripts/bash.sh` to set environment path for DCF
+ 7. Set configuration files for your new site `my_site_id.config.global.ini` and `my_site_id.config.local.ini`
+ 7. create a new drupal site: `scripts/project.sh site deploy dev my_site_id`
+ 8. Read [wokflow documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_workflow.md) and [general documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_documentation.md) for more information
 
 
 ## Compatibility
@@ -51,5 +55,3 @@ DCF need installation of :
   * a PHP web server (Apache, IIS...)
   [see drupal's Web Server requirements](https://www.drupal.org/docs/7/system-requirements/web-server)
   * a DataBase server (MySQL, MariaDB...) [see drupal's Database server requirements](https://www.drupal.org/docs/7/system-requirements/database-server)
-
-
