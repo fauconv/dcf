@@ -28,6 +28,7 @@ SCRIPTS_PATH=scripts #depth need to be only 1
 CONFIG_PATH=config
 DOCUMENT_ROOT=web
 VENDOR_PATH=vendor
+DCF_HOME=.
 
 #admin user
 ADMIN_NAME=developer
@@ -47,7 +48,7 @@ function showHelp {
   echo "  ========="
   echo "    ${SCRIPT_NAME} ${GET}                                             : get DCF (project skeleton) from gitHub."
   echo "                                                                     => need git and internet access"
-  echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : deploy DCF -> get common packages for the project and set project name."
+  echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : deploy or update DCF -> get or update DCF composer packages for the project and set project name."
   echo "                                                                     => need internet access"
   echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id> [--intranet] : create or install (if already exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
   echo "                                                                     If --intranet is set, intranet profil is used, else internet profil is used."
@@ -72,7 +73,7 @@ function showHelp {
 }
 
 #
-# checkGit
+# check Git exist
 #
 function checkGit {
   if ! command -v git >/dev/null 2>&1; then
@@ -85,7 +86,7 @@ function checkGit {
 }
 
 #
-# nodeVersion
+# display node version
 #
 function nodeVersion {
   echo -n "Node version "
@@ -96,7 +97,7 @@ function nodeVersion {
 }
 
 #
-# checkComposer
+# check Composer exist
 #
 function checkConposer {
   echo "CheckComposer:"
@@ -119,6 +120,7 @@ function checkConposer {
 
 #
 # check if is windows
+# bug fix for cygwin/windows getcwd command
 #
 validate_os() {
   IS_WINDOW=false
@@ -126,6 +128,8 @@ validate_os() {
     WIN=`echo ${OS} | grep -i Windows`
     if [ ! -z $WIN ]; then
       IS_WINDOW=true
+      export DCF_HOME=$(pwd)
+      echo -e "\e[1;44m\e[1mYou are on Windows you must run this command each time you change the project directory\e[0m"
     fi
   fi
 }
@@ -156,7 +160,7 @@ function get {
     rm -rf clone
     rm ${SCRIPT_NAME}
       echo ""
-      echo "Now use \"${SCRIPT_NAME} deploy (dev | prod) <name> [description]\" to deploy DCF"
+      echo "Now use \"${SCRIPTS_PATH}/${SCRIPT_NAME} deploy dev <name> [description]\" to deploy DCF"
       echo ""
   else
     echo ""
@@ -178,18 +182,12 @@ function deploy {
   echo "setup project $2..."
   project=$(echo $2 | sed "s| |_|")
   validate_os
-  if [ ${IS_WINDOW} = true ]; then
-    #correct bug of composer + cygwin on windows
-    export COMPOSER_HOME=$(pwd)
-    echo -e "\e[1;44m\e[1mYou are on Windows you must run this command each time you change the project directory\e[0m"
-  else
-    export COMPOSER_HOME=.
-  fi
-  sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${COMPOSER_HOME}/${SCRIPTS_PATH}\"|" composer.json > composer.json2
-  sed "s|\"vendor-dir\": \".*\"|\"vendor-dir\": \"${COMPOSER_HOME}/${VENDOR_PATH}\"|" composer.json2 > composer.json
+  export COMPOSER_HOME=${DCF_HOME}/composer
+  sed "s|\"bin-dir\": \".*\"|\"bin-dir\": \"${DCF_HOME}/${SCRIPTS_PATH}\"|" composer.json > composer.json2
+  sed "s|\"vendor-dir\": \".*\"|\"vendor-dir\": \"${DCF_HOME}/${VENDOR_PATH}\"|" composer.json2 > composer.json
   sed "s|\"home\": \".*\"|\"home\": \"${COMPOSER_HOME}\"|" composer.json > composer.json2
   sed "s|\"cache-dir\": \".*\"|\"cache-dir\": \"${COMPOSER_HOME}/cache\"|" composer.json2 > composer.json
-  sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/composer\"|" composer.json > composer.json2
+  sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/data\"|" composer.json > composer.json2
   sed "s|^.+\n +\"name\": \".*\"|\"name\": \"${project}\"|" composer.json2 > composer.json3
   sed "s|\"description\": \".*\"|\"description\": \"$3\"|" composer.json3 > composer.json
   sed "s|\"name\": \".*\"|\"name\": \"${project}\"|" package.json > package.json2
@@ -202,12 +200,8 @@ function deploy {
   if [ ! "$1" = "prod" ]; then
     PROD=""
   fi
+  if(
   php ${SCRIPTS_PATH}/composer.phar install $PROD --no-suggest
-  RETURN=$?
-  if [ ! ${RETURN} = 0 ]; then
-    exit 1
-  fi
-  php ${SCRIPTS_PATH}/composer.phar update $PROD --no-suggest
   RETURN=$?
   if [ ! ${RETURN} = 0 ]; then
     exit 1
