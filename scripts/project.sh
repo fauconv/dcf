@@ -26,7 +26,7 @@ EXAMPLE=example
 SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
 ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 IS_GET=false
-if [ -f ${ABS_SCRIPT_PATH}/dcf_path ]; then
+if [ -f "${ABS_SCRIPT_PATH}/dcf_path" ]; then
   source ${ABS_SCRIPT_PATH}/dcf_path
 else
   IS_GET=true
@@ -35,9 +35,6 @@ fi
 #admin user
 ADMIN_NAME=developer
 SITE_PROFIL=internet
-
-#other
-GET=get
 
 #
 # showHelp
@@ -48,8 +45,8 @@ function showHelp {
   echo ""
   echo "  = Usage :"
   echo "  ========="
-  if [ $IS_GET=true ]; then
-    echo "    ${SCRIPT_NAME} ${GET}                                          : get DCF (project skeleton) from gitHub."
+  if [ ${IS_GET} = "true" ]; then
+    echo "    ${SCRIPT_NAME} get                                            : get DCF (project skeleton) from gitHub."
     echo "                                                                     => need git and internet access"
   else
     echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : deploy or update DCF -> get or update DCF composer packages for the project and set project name."
@@ -106,18 +103,11 @@ function nodeVersion {
 #
 function checkConposer {
   echo "CheckComposer:"
-  if [ ! -f "composer.json" ]; then
-    echo ""
-    echo -e "\e[31m\e[1m[You must create a project first !\e[0m"
-    echo ""
-    exit 1
-  fi
   if [ ! -f "${ABS_SCRIPTS_PATH}/composer.phar" ]; then
     cd ${ABS_SCRIPTS_PATH}
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
     php composer-setup.php
     rm composer-setup.php
-    cd ..
   else
     echo "Composer self install OK"
   fi
@@ -141,6 +131,7 @@ validate_os() {
 # get
 #
 function get {
+  cd $ABS_SCRIPT_PATH
   if [ -d ".git" ]; then
     echo ""
     echo -e "\e[31m\e[1mCan not get DCF from an existing git directory !\e[0m"
@@ -148,7 +139,6 @@ function get {
     exit 1
   fi
   checkGit
-  cd $ABS_SCRIPT_PATH
   git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG clone
   RETURN=$?
   if [ ! $RETURN = 0 ]; then
@@ -195,6 +185,7 @@ function deploy {
   rm composer.json2 package.json2
   chmod 750 ${SCRIPTS_PATH}/*
   checkConposer
+  cd ${ABS_DCF_PATH}
   chmod 750 ${SCRIPTS_PATH}/*
   PROD="--no-dev"
   if [ ! "$1" = "prod" ]; then
@@ -210,13 +201,13 @@ function deploy {
   if [ ! ${RETURN} = 0 ]; then
     exit 1
   fi
-  chmod -R 750 ${SCRIPTS_PATH}/*
-  if [ ${IS_WINDOW} = true ]; then
+  chmod -R 750 ${VENDOR_BIN_PATH}/*
+  #if [ ${IS_WINDOW} = true ]; then
     #correct bug of php + cygwin on windows
     #sed "s|return require __DIR__.*|return require __DIR__ . '/../${VENDOR_PATH}/autoload.php';|" ${DOCUMENT_ROOT}/autoload.php > ${DOCUMENT_ROOT}/autoload.php2
     #rm ${DOCUMENT_ROOT}/autoload.php
     #mv ${DOCUMENT_ROOT}/autoload.php2 ${DOCUMENT_ROOT}/autoload.php
-  fi
+  #fi
   #nodeVersion
   #if [ "$1" = "prod" ]; then
     #echo "NPM install (prod) :"
@@ -226,6 +217,7 @@ function deploy {
     #${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   #fi
 }
+
 #
 # site_deploy
 #
@@ -283,18 +275,25 @@ function site_deploy {
 # main
 #
 if [ "$1" = "" ]; then
-    showHelp;
+    showHelp
 fi
-if [ ! "$1" = "${GET}" ]; then
-
-    cd ..
+if [ ${IS_GET} = "true" ]; then
+  if [ ! $1 = "get" ]; then
+    showHelp
+  fi
+else
+  if [ $1 = "get" ]; then
+    echo ""
+    echo -e "\e[31m\e[1mGet not allowed in this context\e[0m"
+    showHelp
+  fi
 fi
 
 case $1 in
   deploy )
           deploy "$2" "$3" "$4"
           ;;
-  ${GET} )
+  get )
           get
           ;;
   site )
