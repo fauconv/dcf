@@ -1,0 +1,30 @@
+name: Internet
+type: profile
+description: 'DCF Internet configuration.'
+version: VERSION
+core: 8.x
+dependencies:
+  - node
+  - block
+  - breakpoint
+  - ckeditor
+  - config
+  - menu_link_content
+  - datetime
+  - block_content
+  - quickedit
+  - editor
+  - image
+  - options
+  - path
+  - page_cache
+  - dynamic_page_cache
+  - taxonomy
+  - toolbar
+  - file
+  - rdf
+  - views
+  - automated_cron
+themes:
+  - bartik
+  - seven

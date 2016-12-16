@@ -51,7 +51,9 @@
         "drupal/composer_manager": "1.x-dev",
         "drupal/module_filter": "*",
         "drupal/menu_admin_per_menu": "*",
-        "drush/drush": "^8.1"
+        "drush/drush": "^8.1",
+        "drupal/plugin": "^2.4",
+        "idct/composer-custom-directory": "^1.0@dev"
     },
     "require-dev": {
         "behat/mink": "~1.7",
@@ -63,7 +65,8 @@
         "drupal/libraries_ui": "1.x-dev",
         "drupal/breakpoints_ui": "1.x-dev",
         "drupal/restui": "^1.12",
-        "drupal/module_builder": "3.x-dev"
+        "drupal/module_builder": "3.x-dev",
+        "drupal-code-builder/drupal-code-builder": "3.0.x-dev"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -73,11 +76,12 @@
     "extra": {
         "installer-paths": {
             "web/core": ["type:drupal-core"],
-            "web/libraries/{$name}": ["type:drupal-library"],
+            "web/libraries/contrib/{$name}": ["type:drupal-library"],
             "web/modules/contrib/{$name}": ["type:drupal-module"],
             "web/profiles/contrib/{$name}": ["type:drupal-profile"],
             "web/themes/contrib/{$name}": ["type:drupal-theme"],
-            "drush/contrib/{$name}": ["type:drupal-drush"]
+            "drush/contrib/{$name}": ["type:drupal-drush"],
+            "web/libraries/contrib/drupal-code-builder": ["drupal-code-builder/drupal-code-builder"]
         }
     }
 }
