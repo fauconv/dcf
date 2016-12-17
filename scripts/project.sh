@@ -23,7 +23,7 @@ EXAMPLE=example
 
 #DCF paths
 SCRIPT_NAME=$(basename $0)
-ABS_SCRIPT_PATH=`readlink -e $0`;
+ABS_SCRIPT_PATH=$(dirname `readlink -e $0`);
 if [ "$ABS_SCRIPT_PATH" = "" ]; then
 ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 fi
