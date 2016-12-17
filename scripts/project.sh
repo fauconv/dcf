@@ -22,8 +22,11 @@ LOCAL_CONF=.config.local.ini
 EXAMPLE=example
 
 #DCF paths
-SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
+SCRIPT_NAME=$(basename $0)
+ABS_SCRIPT_PATH=`readlink -e $0`;
+if [ "$ABS_SCRIPT_PATH" = "" ]; then
 ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
+fi
 IS_GET=false
 if [ -f "${ABS_SCRIPT_PATH}/dcf_path" ]; then
   source ${ABS_SCRIPT_PATH}/dcf_path
@@ -150,8 +153,11 @@ function get {
   mv clone/.* . 2> /dev/null
   rm -rf clone
   rm ${SCRIPT_NAME}
+  chmod 750 scripts/*
   echo ""
-  echo "Now use \"${SCRIPT_NAME} deploy dev <project name> [project description]\" to deploy DCF"
+  echo "Now use :"
+  echo "source scripts/path.sh (optional)"
+  echo "${SCRIPT_NAME} deploy dev <project name> [project description]\" to deploy DCF"
   echo ""
 }
 
