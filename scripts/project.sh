@@ -156,11 +156,11 @@ function get {
   rm ${SCRIPT_NAME}
   chmod -R 550 scripts
   source scripts/dcf/dcf_path
-  chmod 750 {CONFIG_PATH}
-  chmod 550 {CONFIG_PATH}/*
-  chmod -R 550 {DOC_PATH}
-  chmod -R 750 {DOCUMENT_ROOT}
-  chmod -R 550 {SCRIPTS_PATH}
+  chmod 750 ${CONFIG_PATH}
+  chmod 550 ${CONFIG_PATH}/*
+  chmod -R 550 ${DOC_PATH}
+  chmod -R 750 ${DOCUMENT_ROOT}
+  chmod -R 550 ${SCRIPTS_PATH}
   echo ""
   echo "Now use :"
   echo "source scripts/path.sh (optional)"
