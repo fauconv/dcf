@@ -14,9 +14,9 @@
         "bin-dir": "vendor/bin",
         "vendor-dir": "vendor",
         "bin-compat": "full",
-        "home": "composer",
-        "cache-dir": "composer/cache",
-        "data-dir": "composer/data",
+        "home": "scripts/composer",
+        "cache-dir": "scripts/composer/cache",
+        "data-dir": "scripts/composer/data",
         "apcu-autoloader": true,
         "optimize-autoloader": true
     },
@@ -72,7 +72,7 @@
     "extra": {
         "installer-paths": {
             "web/core": ["type:drupal-core"],
-            "web/libraries/contrib/{$name}": ["type:drupal-library"],
+            "web/libraries/{$name}": ["type:drupal-library"],
             "web/modules/contrib/{$name}": ["type:drupal-module"],
             "web/profiles/contrib/{$name}": ["type:drupal-profile"],
             "web/themes/contrib/{$name}": ["type:drupal-theme"],

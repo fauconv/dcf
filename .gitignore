@@ -62,6 +62,7 @@ nbproject/**/*
 !/config/example.config.*
 /scripts/composer.phar
 /web/.*
+/web/libraries/drupal-code-builder
 /web/core/**/*
 /web/core/*
 /web/sites/default/*

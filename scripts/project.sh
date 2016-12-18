@@ -28,8 +28,8 @@ if [ "$ABS_SCRIPT_PATH" = "" ]; then
 ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 fi
 IS_GET=false
-if [ -f "${ABS_SCRIPT_PATH}/dcf_path" ]; then
-  source ${ABS_SCRIPT_PATH}/dcf_path
+if [ -f "${ABS_SCRIPT_PATH}/dcf/dcf_path" ]; then
+  source ${ABS_SCRIPT_PATH}/dcf/dcf_path
   cd ${ABS_DCF_PATH}
 else
   IS_GET=true
@@ -313,6 +313,16 @@ read_config() {
 }
 
 #
+# create drush alias for the site
+#
+create_drush_alias() {
+  cd $ABS_DCF_PATH/drush/site-aliases
+  echo "<?php" > ${ID}.alias.drushrc.php
+  echo "$options['uri'] = 'http://${URL0}';" >> ${ID}.alias.drushrc.php
+  echo "$options['root'] = '${ABS_DCF_PATH}';" >> ${ID}.alias.drushrc.php
+}
+
+#
 # site deploy
 #
 function site_deploy {
@@ -333,6 +343,7 @@ function site_deploy {
   create_sites
   create_site
   drush site-install $SITE_TYPE -y --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}" install_configure_form.update_status_module='array(FALSE,FALSE)' install_configure_form.site_default_country='${SITE_COUNTRY}' install_configure_form.date_default_timezone='${SITE_TIME_ZONE}'
+  create_drush_alias
 
 }
 
