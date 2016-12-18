@@ -17,8 +17,8 @@ DCF_URL=https://github.com/fauconv/dcf.git
 DCF_TAG=master
 
 #dcf file names
-GLOBAL_CONF=.config.global.ini
-LOCAL_CONF=.config.local.ini
+GLOBAL_CONF=.config.global.sh
+LOCAL_CONF=.config.local.sh
 EXAMPLE=example
 
 #DCF paths
@@ -231,14 +231,22 @@ function deploy {
   example2_local=${ABS_CONFIG_PATH}"/<site_id>"${LOCAL_CONF}
   echo ""
   echo "Now you can create site:"
-  echo " - Copy ${example_global} into ${example2_global} and fill it with your information"
-  echo " - Copy ${example_local} into ${example2_local} and fill it with your information"
-  echo " - Then install your site by calling ${ABS_SCRIPTS_PATH}/${SCRIPT_NAME} site deploy dev <site-id>"
+  echo " - Copy ${example_global} into"
+  echo "        ${example2_global}"
+  echo "   and fill it with your information"
+  echo " - Copy ${example_local} into"
+  echo "        ${example2_local}"
+  echo "   and fill it with your information"
+  echo " - Then install your site by calling"
+  echo "   ${ABS_SCRIPTS_PATH}/${SCRIPT_NAME} site deploy dev <site-id>"
   echo ""
   echo "Or install an existing site:"
   echo " - use '${SCRIPT_NAME} list' to see existing site"
-  echo " - then Copy ${example_local} into ${example2_local} and fill it with your information"
-  echo " - Then install your site by calling ${ABS_SCRIPTS_PATH}/${SCRIPT_NAME} site deploy dev <site-id>"
+  echo " - then Copy ${example_local} into"
+  echo "             ${example2_local}"
+  echo "   and fill it with your information"
+  echo " - Then install your site by calling"
+  echo "   ${ABS_SCRIPTS_PATH}/${SCRIPT_NAME} site deploy dev <site-id>"
   echo ""
 }
 
@@ -261,12 +269,12 @@ create_site() {
     chmod 770 $SITES_PATH
     cp -r ${SITES_PATH}/default $SITE_DIR
     chmod -R 770 $SITE_DIR
-    mv $SITE_DIR/default.Settings.php $SITE_DIR/settings.php
+    mv $SITE_DIR/default.settings.php $SITE_DIR/settings.php
   else
     echo "Reinitializing site settings..."
     chmod -R 770 $SITE_DIR
     rm $SITE_DIR/settings.php
-    mv $SITE_DIR/default.Settings.php $SITE_DIR/settings.php
+    cp $SITE_DIR/../default/default.settings.php $SITE_DIR/settings.php
   fi
   chmod 770 ${CONFIG_PATH}/sites.php
   for f in ${URL}
@@ -295,7 +303,7 @@ read_config() {
     exit 1
   fi
   source ${global_file}
-  if [ "${SITE_NAME}" = "" -o "${SITE_LANG}" = "" ]; then
+  if [ "${SITE_NAME}" = "" -o "${SITE_TYPE}" = "" ]; then
     echo ""
     echo -e "\e[31m\e[1mFile ${global_file} is empty\e[0m"
     echo ""
@@ -308,8 +316,9 @@ read_config() {
     exit 1
   fi
   source ${local_file}
-  URL0=`echo $SITE_URLS | sed 's|,.*||g' | sed 's|http[s]*://||g' | sed "s|'||g" | sed "s|/.*||g"`
-  URL=`echo $SITE_URLS | sed 's|,| |g' | sed 's|http[s]*://||g'`
+  URL0=`echo $SITE_URLS | sed 's|,.*||g' | sed "s|'||g"`
+  URL0_HTTP=`echo $URL0 | sed 's|http[s]*://||g' |sed 's|/.*||g'`
+  URL=`echo $SITE_URLS | sed 's|,| |g' | sed 's|http[s]*://||g' | sed 's|/|\.|g'`
 }
 
 #
@@ -318,8 +327,8 @@ read_config() {
 create_drush_alias() {
   cd $ABS_DCF_PATH/drush/site-aliases
   echo "<?php" > ${ID}.alias.drushrc.php
-  echo "$options['uri'] = 'http://${URL0}';" >> ${ID}.alias.drushrc.php
-  echo "$options['root'] = '${ABS_DCF_PATH}';" >> ${ID}.alias.drushrc.php
+  echo "\$options['uri'] = '${URL0}';" >> ${ID}.alias.drushrc.php
+  echo "\$options['root'] = '${ABS_DCF_PATH}';" >> ${ID}.alias.drushrc.php
 }
 
 #
@@ -342,7 +351,9 @@ function site_deploy {
   read_config
   create_sites
   create_site
-  drush site-install $SITE_TYPE -y --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}" install_configure_form.update_status_module='array(FALSE,FALSE)' install_configure_form.site_default_country='${SITE_COUNTRY}' install_configure_form.date_default_timezone='${SITE_TIME_ZONE}'
+  cd $DOCUMENT_ROOT
+  drush site-install $SITE_TYPE -y --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}" install_configure_form.update_status_module='array(FALSE,FALSE)' install_configure_form.site_default_country='${SITE_COUNTRY}' install_configure_form.date_default_timezone='${SITE_TIME_ZONE}'
+  cd $ABS_DCF_PATH
   create_drush_alias
 
 }
