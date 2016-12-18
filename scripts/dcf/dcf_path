@@ -18,7 +18,7 @@ SCRIPTS_PATH=scripts #depth need to be only 1
 
 PATH_SCRIPT_PATH=$ABS_SCRIPT_PATH
 if command -v 'cygpath' >/dev/null 2>&1; then
-  $ABS_SCRIPT_PATH=$(cygpath -m "$ABS_SCRIPT_PATH");
+  ABS_SCRIPT_PATH=$(cygpath -m "$ABS_SCRIPT_PATH");
 fi
 ABS_DCF_PATH=$(dirname $ABS_SCRIPT_PATH)
 PATH_DCF_PATH=$(dirname $PATH_SCRIPT_PATH)
