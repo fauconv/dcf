@@ -155,7 +155,7 @@ function get {
   rm -rf clone
   rm ${SCRIPT_NAME}
   chmod -R 550 scripts
-  source scripts/dcf_path
+  source scripts/dcf/dcf_path
   chmod 750 {CONFIG_PATH}
   chmod 550 {CONFIG_PATH}/*
   chmod -R 550 {DOC_PATH}
