@@ -13,8 +13,8 @@
 # const
 #
 VERSION_SCRIPT="0.1.0"
-DRUPAL_ANGULAR_URL=https://github.com/fauconv/dcf.git
-DRUPAL_ANGULAR_TAG=master
+DCF_URL=https://github.com/fauconv/dcf.git
+DCF_TAG=master
 
 #dcf file names
 GLOBAL_CONF=.config.global.ini
@@ -30,9 +30,12 @@ fi
 IS_GET=false
 if [ -f "${ABS_SCRIPT_PATH}/dcf_path" ]; then
   source ${ABS_SCRIPT_PATH}/dcf_path
+  cd ${ABS_DCF_PATH}
 else
   IS_GET=true
+  cd $ABS_SCRIPT_PATH
 fi
+chmod 750 .
 
 #admin user
 ADMIN_NAME=developer
@@ -47,13 +50,13 @@ function showHelp {
   echo ""
   echo "  = Usage :"
   echo "  ========="
-  if [ ${IS_GET} = "true" ]; then
+  if [ "${IS_GET}" = "true" ]; then
     echo "    ${SCRIPT_NAME} get                                            : get DCF (project skeleton) from gitHub."
     echo "                                                                     => need git and internet access"
   else
     echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : deploy or update DCF -> get or update DCF composer packages for the project and set project name."
     echo "                                                                     => need internet access"
-    echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id> [--intranet] : create or install (if already exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
+    echo "    ${SCRIPT_NAME} site deploy (dev | prod) <site_id>              : create or install (if already exist) a web-site in the project for development (create skeleton + install packages(composer, npm, build) + install drupal)"
     echo "                                                                     If --intranet is set, intranet profil is used, else internet profil is used."
     echo "    ${SCRIPT_NAME} site rebuild (dev | prod) <site-id>             : compil and build a site for frontend in development"
     echo "    ${SCRIPT_NAME} site fix <site-id>                              : Fix packages version (composer and npm) used for this site, usefull for production server, avoid unwanted update of package"
@@ -83,7 +86,7 @@ function checkGit {
   if ! command -v git >/dev/null 2>&1; then
     echo ""
     echo -e "\e[31m\e[1mGit must be installed and define in the \$PATH variable !\e[0m"
-    echo "You can directly get DCF on github: ${DRUPAL_ANGULAR_URL}"
+    echo "You can directly get DCF on github: ${DCF_URL}"
     echo ""
     exit 1
   fi
@@ -117,7 +120,6 @@ function checkConposer {
 
 #
 # check if is windows
-# bug fix for cygwin/windows getcwd command
 #
 validate_os() {
   IS_WINDOW=false
@@ -133,7 +135,6 @@ validate_os() {
 # get
 #
 function get {
-  cd $ABS_SCRIPT_PATH
   if [ -d ".git" ]; then
     echo ""
     echo -e "\e[31m\e[1mCan not get DCF from an existing git directory !\e[0m"
@@ -141,7 +142,7 @@ function get {
     exit 1
   fi
   checkGit
-  git clone $DRUPAL_ANGULAR_URL --single-branch --branch $DRUPAL_ANGULAR_TAG clone
+  git clone $DCF_URL --single-branch --depth=1 --branch $DCF_TAG clone
   RETURN=$?
   if [ ! $RETURN = 0 ]; then
     echo ""
@@ -153,7 +154,13 @@ function get {
   mv clone/.* . 2> /dev/null
   rm -rf clone
   rm ${SCRIPT_NAME}
-  chmod 750 scripts/*
+  chmod -R 550 scripts
+  source scripts/dcf_path
+  chmod 750 {CONFIG_PATH}
+  chmod 550 {CONFIG_PATH}/*
+  chmod -R 550 {DOC_PATH}
+  chmod -R 750 {DOCUMENT_ROOT}
+  chmod -R 550 {SCRIPTS_PATH}
   echo ""
   echo "Now use :"
   echo "source scripts/path.sh (optional)"
@@ -174,7 +181,6 @@ function deploy {
   echo "setup project $2..."
   project=$(echo $2 | sed "s| |_|")
   validate_os
-  cd ${ABS_DCF_PATH}
   sed "s|^.+\n +\"name\": \".*\"|\"name\": \"${project}\"|" composer.json > composer.json2
   sed "s|\"description\": \".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
   sed "s|\"name\": \".*\"|\"name\": \"${project}\"|" package.json > package.json2
@@ -188,10 +194,8 @@ function deploy {
   #sed "s|\"data-dir\": \".*\"|\"data-dir\": \"${COMPOSER_HOME}/data\"|" composer.json > composer.json2
 
   rm composer.json2 package.json2
-  chmod 750 ${SCRIPTS_PATH}/*
+  chmod -R 750 ${SCRIPTS_PATH}
   checkConposer
-  cd ${ABS_DCF_PATH}
-  chmod 750 ${SCRIPTS_PATH}/*
   PROD="--no-dev"
   if [ ! "$1" = "prod" ]; then
     PROD=""
@@ -206,7 +210,7 @@ function deploy {
   if [ ! ${RETURN} = 0 ]; then
     exit 1
   fi
-  chmod -R 750 ${VENDOR_BIN_PATH}/*
+  chmod -R 550 ${SCRIPTS_PATH}
   #if [ ${IS_WINDOW} = true ]; then
     #correct bug of php + cygwin on windows
     #sed "s|return require __DIR__.*|return require __DIR__ . '/../${VENDOR_PATH}/autoload.php';|" ${DOCUMENT_ROOT}/autoload.php > ${DOCUMENT_ROOT}/autoload.php2
@@ -221,59 +225,115 @@ function deploy {
     #echo "NPM install (dev)"
     #${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   #fi
+  example_global=${ABS_CONFIG_PATH}/${EXAMPLE}${GLOBAL_CONF}
+  example_local=${ABS_CONFIG_PATH}/${EXAMPLE}${LOCAL_CONF}
+  example2_global=${ABS_CONFIG_PATH}"/<site_id>"${GLOBAL_CONF}
+  example2_local=${ABS_CONFIG_PATH}"/<site_id>"${LOCAL_CONF}
+  echo ""
+  echo "Now you can create site:"
+  echo " - Copy ${example_global} into ${example2_global} and fill it with your information"
+  echo " - Copy ${example_local} into ${example2_local} and fill it with your information"
+  echo " - Then install your site by calling ${ABS_SCRIPTS_PATH}/${SCRIPT_NAME} site deploy dev <site-id>"
+  echo ""
+  echo "Or install an existing site:"
+  echo " - use '${SCRIPT_NAME} list' to see existing site"
+  echo " - then Copy ${example_local} into ${example2_local} and fill it with your information"
+  echo " - Then install your site by calling ${ABS_SCRIPTS_PATH}/${SCRIPT_NAME} site deploy dev <site-id>"
+  echo ""
 }
 
 #
-# site_deploy
+# create sites.php in config
 #
-function site_deploy {
-  if [ $2 = "" ]; then
-      echo ""
-      echo -e "\e[31m\e[1mSite id missing !\e[0m"
-      showHelp;
+create_sites() {
+  if [ ! -e "${CONFIG_PATH}/sites.php" ]; then
+    chmod 750 ${CONFIG_PATH}
+    echo "<?php" > ${CONFIG_PATH}/sites.php
   fi
-  ID=`echo $2 | sed 's|[^a-z]+||g'`
-  if [ $ID = "" ]; then
-      echo ""
-      echo -e "\e[31m\e[1mSite id can only contain lowercase !\e[0m"
-      echo ""
-      exit 1
+}
+
+#
+# create site directory
+#
+create_site() {
+  if [ ! -d "${SITE_DIR}" ]; then
+    echo "Create site directory..."
+    chmod 770 $SITES_PATH
+    cp -r ${SITES_PATH}/default $SITE_DIR
+    chmod -R 770 $SITE_DIR
+    mv $SITE_DIR/default.Settings.php $SITE_DIR/settings.php
+  else
+    echo "Reinitializing site settings..."
+    chmod -R 770 $SITE_DIR
+    rm $SITE_DIR/settings.php
+    mv $SITE_DIR/default.Settings.php $SITE_DIR/settings.php
   fi
-  global_file=${CONFIG_PATH}/${ID}${GLOBAL_CONF}
-  local_file=${CONFIG_PATH}/${ID}${LOCAL_CONF}
-  yml_file=${CONFIG_PATH}/${ID}${YML_CONF}
-  if [ ! -f ${yml_file} ]; then
-    if  ! -f ${CONFIG_PATH}/${EXAMPLE}${YML_CONF} ]; then
-      echo ""
-      echo -e "\e[31m\e[1mFile ${CONFIG_PATH}/${EXAMPLE}${YML_CONF} no longer exist, recreate it from gitHub !\e[0m"
-      echo ""
-      exit 1
-    fi
-    cp ${CONFIG_PATH}/${EXAMPLE}${YML_CONF} ${yml_file}
-  fi
+  chmod 770 ${CONFIG_PATH}/sites.php
+  for f in ${URL}
+  do
+    echo -n "\$sites[" >> ${CONFIG_PATH}/sites.php
+    echo -n ${f}  >> ${CONFIG_PATH}/sites.php
+    echo -n "] = '" >> ${CONFIG_PATH}/sites.php
+    echo -n ${ID} >> ${CONFIG_PATH}/sites.php
+    echo "';" >> ${CONFIG_PATH}/sites.php
+  done
+  chmod 550 ${CONFIG_PATH}/sites.php
+}
+
+#
+# read configuration files for a site
+#
+read_config() {
+  global_file=${ABS_CONFIG_PATH}/${ID}${GLOBAL_CONF}
+  local_file=${ABS_CONFIG_PATH}/${ID}${LOCAL_CONF}
+  example_global=${ABS_CONFIG_PATH}/${EXAMPLE}${GLOBAL_CONF}
+  example_local=${ABS_CONFIG_PATH}/${EXAMPLE}${LOCAL_CONF}
   if [ ! -f ${global_file} ]; then
     echo ""
-    echo -e "\e[31m\e[1mFile ${global_file} is missing\e[0m"
+    echo -e "\e[31m\e[1mFile ${global_file} is missing create it by copy of ${example_global}\e[0m"
     echo ""
-    cp ${CONFIG_PATH}/${EXAMPLE}${GLOBAL_CONF} ${global_file}
     exit 1
   fi
-  source ${global}
-  if [ $site_name="" ]; then
+  source ${global_file}
+  if [ "${SITE_NAME}" = "" -o "${SITE_LANG}" = "" ]; then
     echo ""
     echo -e "\e[31m\e[1mFile ${global_file} is empty\e[0m"
     echo ""
     exit 1
   fi
-  if [ $3=="--intranet"]; then
-    $SITE_PROFIL=intranet
+  if [ ! -f ${local_file} ]; then
+    echo ""
+    echo -e "\e[31m\e[1mFile ${local_file} is missing create it by copy of ${example_local}\e[0m"
+    echo ""
+    exit 1
   fi
-  ${SCRIPTS_PATH}/drupal init --destination="." -n
-  if [! -f ${global_file} ]; then
-    ${SCRIPTS_PATH}/drupal chain --file=${yml_file}
-  else
-    ${SCRIPTS_PATH}/drupal chain --file=${yml_file} --placeholder="db_type: $db_type"
+  source ${local_file}
+  URL0=`echo $SITE_URLS | sed 's|,.*||g' | sed 's|http[s]*://||g' | sed "s|'||g" | sed "s|/.*||g"`
+  URL=`echo $SITE_URLS | sed 's|,| |g' | sed 's|http[s]*://||g'`
+}
+
+#
+# site deploy
+#
+function site_deploy {
+  if [ "$2" = "" ]; then
+      echo ""
+      echo -e "\e[31m\e[1mSite id missing !\e[0m"
+      showHelp;
   fi
+  ID=`echo $2 | sed 's|[^a-z]+||g'`
+  if [ "$ID" = "" ]; then
+      echo ""
+      echo -e "\e[31m\e[1mSite id can only contain lowercase !\e[0m"
+      echo ""
+      exit 1
+  fi
+  SITE_DIR=${SITES_PATH}/$ID
+  read_config
+  create_sites
+  create_site
+  drush site-install $SITE_TYPE -y --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}" install_configure_form.update_status_module='array(FALSE,FALSE)' install_configure_form.site_default_country='${SITE_COUNTRY}' install_configure_form.date_default_timezone='${SITE_TIME_ZONE}'
+
 }
 
 #
@@ -282,12 +342,12 @@ function site_deploy {
 if [ "$1" = "" ]; then
     showHelp
 fi
-if [ ${IS_GET} = "true" ]; then
+if [ "${IS_GET}" = "true" ]; then
   if [ ! $1 = "get" ]; then
     showHelp
   fi
 else
-  if [ $1 = "get" ]; then
+  if [ "$1" = "get" ]; then
     echo ""
     echo -e "\e[31m\e[1mGet not allowed in this context\e[0m"
     showHelp
