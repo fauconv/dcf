@@ -113,6 +113,7 @@ function checkConposer {
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
     php composer-setup.php
     rm composer-setup.php
+    cd $ABS_DCF_PATH
   else
     echo "Composer self install OK"
   fi
