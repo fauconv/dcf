@@ -84,7 +84,7 @@ function showHelp {
 #
 # check CUrl exist
 #
-function tryCurl {
+function trycurl {
   if ! command -v curl >/dev/null 2>&1; then
     trywget
   fi
@@ -103,9 +103,11 @@ function tryCurl {
 #
 # check wget exist
 #
-function tryCurl {
+function trywget {
   if ! command -v wget >/dev/null 2>&1; then
-    trywget
+    echo ""
+    echo -e "\e[31m\e[1mInstallation fail, You need git; curm or wget to use 'get' option. install one of it or download DCF directly from github: ${DCF_URL}\e[0m"
+    exit
   fi
   wget --no-check-certificate $DCF_URL_DOWNLOAD -O - | tar xz
   RETURN=$?
@@ -122,7 +124,7 @@ function tryCurl {
 #
 # check Git exist
 #
-function tryGit {
+function trygit {
   if [ -d ".git" ]; then
     if [ "$1" = "1" }; then
       echo ""
