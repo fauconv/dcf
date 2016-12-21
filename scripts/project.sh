@@ -87,6 +87,7 @@ function showHelp {
 function trycurl {
   if ! command -v curl >/dev/null 2>&1; then
     trywget
+    return
   fi
   curl -sL $DCF_URL_DOWNLOAD | tar xz
   RETURN=$?
@@ -131,6 +132,7 @@ function trygit {
       echo -e "\e[31m\e[1mInstallation fail, root directory of DCF can not containt \".git\" directory at this step or install unzip + curl or wget!\e[0m"
       exit
     else
+      trycurl
       return
     fi
   fi
@@ -204,7 +206,6 @@ function get {
     if command -v git >/dev/null 2>&1; then
       trygit 2
     fi
-    trycurl
   fi
   chmod -R 550 scripts
   source scripts/dcf/dcf_path
