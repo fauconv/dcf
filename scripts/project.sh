@@ -13,11 +13,13 @@
 # const
 #
 VERSION_SCRIPT="0.1.0"
-DCF_URL=https://github.com/fauconv/dcf.git
+DCF_URL=https://github.com/fauconv/dcf
 DCF_TAG=master
+DCF_URL_GIT=${DCF_URL}.git
+DCF_URL_DOWNLOAD=${DCF_URL}/tarball/${DCF_TAG}
+
 
 #dcf file names
-GLOBAL_CONF=.config.global.sh
 LOCAL_CONF=.config.local.sh
 EXAMPLE=example
 
@@ -52,7 +54,7 @@ function showHelp {
   echo "  ========="
   if [ "${IS_GET}" = "true" ]; then
     echo "    ${SCRIPT_NAME} get                                            : get DCF (project skeleton) from gitHub."
-    echo "                                                                     => need git and internet access"
+    echo "                                                                     => need git, or curl, or wget and internet access"
   else
     echo "    ${SCRIPT_NAME} deploy (dev | prod) <name> [description]        : deploy or update DCF -> get or update DCF composer packages for the project and set project name."
     echo "                                                                     => need internet access"
@@ -80,16 +82,68 @@ function showHelp {
 }
 
 #
+# check CUrl exist
+#
+function tryCurl {
+  if ! command -v curl >/dev/null 2>&1; then
+    trywget
+  fi
+  curl -sL $DCF_URL_DOWNLOAD | tar xz
+  RETURN=$?
+  if [ ! $RETURN = 0 ]; then
+    echo ""
+    echo -e "\e[31m\e[1mInstallation fail, curl cannot retrive component! Check your internet connection or try again later\e[0m"
+    exit
+  fi
+  mv *-dcf*/* *-dcf*/.* .
+  rm -rf *-dcf*
+  rm ${SCRIPT_NAME}
+}
+
+#
+# check wget exist
+#
+function tryCurl {
+  if ! command -v wget >/dev/null 2>&1; then
+    trywget
+  fi
+  wget --no-check-certificate $DCF_URL_DOWNLOAD -O - | tar xz
+  RETURN=$?
+  if [ ! $RETURN = 0 ]; then
+    echo ""
+    echo -e "\e[31m\e[1mInstallation fail, wget cannot retrive component! Check your internet connection or try again later\e[0m"
+    exit
+  fi
+  mv *-dcf*/* *-dcf*/.* .
+  rm -rf *-dcf*
+  rm ${SCRIPT_NAME}
+}
+
+#
 # check Git exist
 #
-function checkGit {
-  if ! command -v git >/dev/null 2>&1; then
-    echo ""
-    echo -e "\e[31m\e[1mGit must be installed and define in the \$PATH variable !\e[0m"
-    echo "You can directly get DCF on github: ${DCF_URL}"
-    echo ""
-    exit 1
+function tryGit {
+  if [ -d ".git" ]; then
+    if [ "$1" = "1" }; then
+      echo ""
+      echo -e "\e[31m\e[1mInstallation fail, root directory of DCF can not containt \".git\" directory at this step or install unzip + curl or wget!\e[0m"
+      exit
+    else
+      return
+    fi
   fi
+  git clone $DCF_URL_GIT --single-branch --depth=1 --branch $DCF_TAG clone
+  RETURN=$?
+  if [ ! $RETURN = 0 ]; then
+    echo ""
+    echo -e "\e[31m\e[1mInstallation fail, git cannot retrive component! Check your internet connection or try again later\e[0m"
+    exit
+  fi
+  rm -rf clone/.git
+  mv clone/* . 2> /dev/null
+  mv clone/.* . 2> /dev/null
+  rm -rf clone
+  rm ${SCRIPT_NAME}
 }
 
 #
@@ -136,25 +190,20 @@ validate_os() {
 # get
 #
 function get {
-  if [ -d ".git" ]; then
-    echo ""
-    echo -e "\e[31m\e[1mCan not get DCF from an existing git directory !\e[0m"
-    echo ""
-    exit 1
+  if ! command -v unzip >/dev/null 2>&1; then
+    if ! command -v git >/dev/null 2>&1; then
+      echo ""
+      echo -e "\e[31m\e[1mInstallation fail, You need git or unzip with curl or wget to use \"deploy get\". Try to download directly DCF from github ${DCF_URL}\e[0m"
+      exit 1
+    else
+      trygit 1
+    fi
+  else
+    if command -v git >/dev/null 2>&1; then
+      trygit 2
+    fi
+    trycurl
   fi
-  checkGit
-  git clone $DCF_URL --single-branch --depth=1 --branch $DCF_TAG clone
-  RETURN=$?
-  if [ ! $RETURN = 0 ]; then
-    echo ""
-    echo -e "\e[31m\e[1mInstallation fail, git cannot retrive component !\e[0m"
-    exit
-  fi
-  rm -rf clone/.git
-  mv clone/* . 2> /dev/null
-  mv clone/.* . 2> /dev/null
-  rm -rf clone
-  rm ${SCRIPT_NAME}
   chmod -R 550 scripts
   source scripts/dcf/dcf_path
   chmod 750 ${CONFIG_PATH}
@@ -226,15 +275,10 @@ function deploy {
     #echo "NPM install (dev)"
     #${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   #fi
-  example_global=${ABS_CONFIG_PATH}/${EXAMPLE}${GLOBAL_CONF}
   example_local=${ABS_CONFIG_PATH}/${EXAMPLE}${LOCAL_CONF}
-  example2_global=${ABS_CONFIG_PATH}"/<site_id>"${GLOBAL_CONF}
   example2_local=${ABS_CONFIG_PATH}"/<site_id>"${LOCAL_CONF}
   echo ""
   echo "Now you can create site:"
-  echo " - Copy ${example_global} into"
-  echo "        ${example2_global}"
-  echo "   and fill it with your information"
   echo " - Copy ${example_local} into"
   echo "        ${example2_local}"
   echo "   and fill it with your information"
@@ -293,23 +337,8 @@ create_site() {
 # read configuration files for a site
 #
 read_config() {
-  global_file=${ABS_CONFIG_PATH}/${ID}${GLOBAL_CONF}
   local_file=${ABS_CONFIG_PATH}/${ID}${LOCAL_CONF}
-  example_global=${ABS_CONFIG_PATH}/${EXAMPLE}${GLOBAL_CONF}
   example_local=${ABS_CONFIG_PATH}/${EXAMPLE}${LOCAL_CONF}
-  if [ ! -f ${global_file} ]; then
-    echo ""
-    echo -e "\e[31m\e[1mFile ${global_file} is missing create it by copy of ${example_global}\e[0m"
-    echo ""
-    exit 1
-  fi
-  source ${global_file}
-  if [ "${SITE_NAME}" = "" -o "${SITE_TYPE}" = "" ]; then
-    echo ""
-    echo -e "\e[31m\e[1mFile ${global_file} is empty\e[0m"
-    echo ""
-    exit 1
-  fi
   if [ ! -f ${local_file} ]; then
     echo ""
     echo -e "\e[31m\e[1mFile ${local_file} is missing create it by copy of ${example_local}\e[0m"
@@ -353,7 +382,7 @@ function site_deploy {
   create_sites
   create_site
   cd $DOCUMENT_ROOT
-  drush site-install $SITE_TYPE -y --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}" install_configure_form.update_status_module='array(FALSE,FALSE)' install_configure_form.site_default_country='${SITE_COUNTRY}' install_configure_form.date_default_timezone='${SITE_TIME_ZONE}'
+  drush site-install $SITE_TYPE -y --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
   cd $ABS_DCF_PATH
   create_drush_alias
 
