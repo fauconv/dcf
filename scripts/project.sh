@@ -216,8 +216,8 @@ function get {
   chmod -R 550 ${SCRIPTS_PATH}
   echo ""
   echo "Now use :"
-  echo "source scripts/path.sh (optional)"
-  echo "${SCRIPT_NAME} deploy dev <project name> [project description]\" to deploy DCF"
+  echo "source ${SCRIPTS_PATH}/path.sh (optional)"
+  echo "${SCRIPTS_PATH}/${SCRIPT_NAME} deploy dev <project name> [project description]\" to deploy DCF"
   echo ""
 }
 
@@ -281,17 +281,9 @@ function deploy {
   example_local=${ABS_CONFIG_PATH}/${EXAMPLE}${LOCAL_CONF}
   example2_local=${ABS_CONFIG_PATH}"/<site_id>"${LOCAL_CONF}
   echo ""
-  echo "Now you can create site:"
+  echo "Now you can create a site or install an existing one:"
   echo " - Copy ${example_local} into"
   echo "        ${example2_local}"
-  echo "   and fill it with your information"
-  echo " - Then install your site by calling"
-  echo "   ${ABS_SCRIPTS_PATH}/${SCRIPT_NAME} site deploy dev <site-id>"
-  echo ""
-  echo "Or install an existing site:"
-  echo " - use '${SCRIPT_NAME} list' to see existing site"
-  echo " - then Copy ${example_local} into"
-  echo "             ${example2_local}"
   echo "   and fill it with your information"
   echo " - Then install your site by calling"
   echo "   ${ABS_SCRIPTS_PATH}/${SCRIPT_NAME} site deploy dev <site-id>"
@@ -385,7 +377,7 @@ function site_deploy {
   create_sites
   create_site
   cd $DOCUMENT_ROOT
-  drush site-install $SITE_TYPE -y --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
+  ${ABS_VENDOR_BIN_PATH}/drush site-install $SITE_TYPE -y --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
   cd $ABS_DCF_PATH
   create_drush_alias
 
