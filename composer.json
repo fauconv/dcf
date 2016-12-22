@@ -77,7 +77,7 @@
             "web/profiles/contrib/{$name}": ["type:drupal-profile"],
             "web/themes/contrib/{$name}": ["type:drupal-theme"],
             "drush/contrib/{$name}": ["type:drupal-drush"],
-            "web/libraries/contrib/drupal-code-builder": ["drupal-code-builder/drupal-code-builder"]
+            "web/libraries/drupal-code-builder": ["drupal-code-builder/drupal-code-builder"]
         }
     }
 }

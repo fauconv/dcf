@@ -234,7 +234,7 @@ function deploy {
   echo "setup project $2..."
   project=$(echo $2 | sed "s| |_|")
   validate_os
-  sed "s|^.+\n +\"name\": \".*\"|\"name\": \"${project}\"|" composer.json > composer.json2
+  sed "s|^.+\n +\"name\": \".*/.*\"|\"name\": \"${project}\"|" composer.json > composer.json2
   sed "s|\"description\": \".*\"|\"description\": \"$3\"|" composer.json2 > composer.json
   sed "s|\"name\": \".*\"|\"name\": \"${project}\"|" package.json > package.json2
   sed "s|\"description\": \".*\"|\"description\": \"$3\"|" package.json2 > package.json
