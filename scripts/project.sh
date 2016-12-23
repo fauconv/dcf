@@ -20,7 +20,8 @@ DCF_URL_DOWNLOAD=${DCF_URL}/tarball/${DCF_TAG}
 
 
 #dcf file names
-LOCAL_CONF=.config.local.sh
+LOCAL_CONF=.config.local.ini
+GLOBAL_CONF=.config.global.ini
 EXAMPLE=example
 
 #DCF paths
@@ -316,16 +317,23 @@ create_site() {
     rm $SITE_DIR/settings.php
     cp $SITE_DIR/../default/default.settings.php $SITE_DIR/settings.php
   fi
-  chmod 770 ${CONFIG_PATH}/sites.php
+  cd ${CONFIG_PATH}
+  chmod 770 sites.php
+  sed "s|^.*${ID}.*$||g" sites.php > sites2.php
+  cp sites2.php sites.php
   for f in ${URL}
   do
-    echo -n "\$sites[" >> ${CONFIG_PATH}/sites.php
-    echo -n ${f}  >> ${CONFIG_PATH}/sites.php
-    echo -n "] = '" >> ${CONFIG_PATH}/sites.php
-    echo -n ${ID} >> ${CONFIG_PATH}/sites.php
-    echo "';" >> ${CONFIG_PATH}/sites.php
+    sed "s|^.*${f}.*||g" sites.php > sites2.php
+    echo -n "\$sites[" >> sites2.php
+    echo -n ${f}  >> sites2.php
+    echo -n "] = '" >> sites2.php
+    echo -n ${ID} >> sites2.php
+    echo "';" >> sites2.php
+    cp sites2.php sites.php
   done
-  chmod 550 ${CONFIG_PATH}/sites.php
+  rm -f sites2.php
+  chmod 550 sites.php
+  cd ${ABS_DCF_PATH}
 }
 
 #
@@ -344,6 +352,22 @@ read_config() {
   URL0=`echo $SITE_URLS | sed 's|,.*||g' | sed "s|'||g"`
   URL0_HTTP=`echo $URL0 | sed 's|http[s]*://||g' |sed 's|/.*||g'`
   URL=`echo $SITE_URLS | sed 's|,| |g' | sed 's|http[s]*://||g' | sed 's|/|\.|g'`
+
+  global_file=${ABS_CONFIG_PATH}/${ID}${GLOBAL_CONF}
+  example_global=${ABS_CONFIG_PATH}/${EXAMPLE}${GLOBAL_CONF}
+  if [ ! -f ${global_file} ]; then
+    echo ""
+    echo -e "\e[31m\e[1mFile ${global_file} is missing create it by copy of ${example_global}\e[0m"
+    echo ""
+    exit 1
+  fi
+  source ${global_file}
+  if [ "${SITE_NAME}" = "" ]; then
+    echo ""
+    echo -e "\e[31m\e[1mFile ${global_file} is empty\e[0m"
+    echo ""
+    exit 1
+  fi
 }
 
 #
@@ -353,7 +377,28 @@ create_drush_alias() {
   cd $ABS_DCF_PATH/drush/site-aliases
   echo "<?php" > ${ID}.alias.drushrc.php
   echo "\$options['uri'] = '${URL0}';" >> ${ID}.alias.drushrc.php
-  echo "\$options['root'] = '${ABS_DCF_PATH}';" >> ${ID}.alias.drushrc.php
+  echo "\$options['root'] = '${ABS_DOCUMENT_ROOT}';" >> ${ID}.alias.drushrc.php
+}
+
+function get_lang() {
+  DRUPAL_VERSION=`${ABS_VENDOR_BIN_PATH}/drush.php st --root="${ABS_DOCUMENT_ROOT}" | grep "Drupal version" | grep -o "8\.[0-9]\.[0-9]"`
+  pofile="drupal-${DRUPAL_VERSION}.${LANG}.po"
+  popath="${ABS_SITES_PATH}/${ID}/${TRANSLATIONS_PATH}/${pofile}"
+  pofull="${popath}/${pofile}"
+  if [ ! -f $popath ]; then
+    echo "Download translation : http://ftp.drupal.org/files/translations/8.x/drupal/${pofile}"
+    if command -v curl >/dev/null 2>&1; then
+      curl -sL "http://ftp.drupal.org/files/translations/8.x/drupal/${pofile}" > ${pofull}
+    else
+      if ! command -v wget >/dev/null 2>&1; then
+        cd ${popath}
+        wget "http://ftp.drupal.org/files/translations/8.x/drupal/${pofile}"
+        cd $ABS_DCF_PATH
+      else
+        echo "Download fail ! installation continu..."
+      fi
+    fi
+  fi
 }
 
 #
@@ -376,8 +421,15 @@ function site_deploy {
   read_config
   create_sites
   create_site
+  if [ "${LANG}" = "en" -o "${LANG}" = "EN" ]; then
+    LOCAL=""
+  else
+    LOCAL="--locale=\"${LANG}\""
+    get_lang
+  fi
   cd $DOCUMENT_ROOT
-  ${ABS_VENDOR_BIN_PATH}/drush site-install $SITE_TYPE -y --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
+  #echo "${ABS_VENDOR_BIN_PATH}/drush.php site-install $SITE_TYPE -y --root=\"${ABS_DOCUMENT_ROOT}\" $LOCAL --account-name=\"developer\" --account-mail=\"${ADMIN_MAIL}\" --site-mail=\"no-reply@${URL0_HTTP}\" --site-name=\"${SITE_NAME}\" --sites-subdir=\"${ID}\" --db-url=\"${DATABASE}\""
+  ${ABS_VENDOR_BIN_PATH}/drush.php site-install $SITE_TYPE -y --root="${ABS_DOCUMENT_ROOT}" $LOCAL --account-name="developer" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
   cd $ABS_DCF_PATH
   create_drush_alias
 
