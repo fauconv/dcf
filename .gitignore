@@ -28,7 +28,8 @@ coverage
 node_modules
 jspm_packages
 vendor
-composer
+/scripts/composer
+/scripts/composer.phar
 
 # Optional npm cache directory
 .npm
@@ -53,15 +54,13 @@ composer
 nbproject/*
 nbproject/**/*
 
-# test directory
-/test/*
-/test/**/*
-
-# Drupal package from composer
-/config/*.config.yml
+# DCF files
+/config/*.config.local.ini
 !/config/example.config.*
-/scripts/composer.phar
+
+# Drupal files and contrib
 /web/.*
+!/web/.htaccess
 /web/libraries/drupal-code-builder
 /web/core/**/*
 /web/core/*
