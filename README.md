@@ -24,7 +24,7 @@ This project is just a **SANDBOX** for the moment. **No stable version is provid
  * DCF is standalone (composer, nodejs and packages are downloaded locally in the project, no global tool needed). Only PHP CLI and a web server are needed. Environment variables are not used.
  * Stay 100% compatible Drupal, Angular, Ionic. (No core modifications, Drupal, Angular and Other libraries are downloaded from official sources and use latest version)
  * Provide a Drupal distribution with a maximum quality for redactor to manage content, images... (pre-configured roles and permissions for administrator redactor and anonymous user, pre-configured CKEditor, a set of mandatories modules: pathauto...) (Improved backoffice capability : imageMagik ...), based on [Drupal 7 custom factory](https://github.com/fauconv/ctm_drupal7)
- * DCF manage drupal multi-sites with or with apache aliases automaticaly (http://example.com/alias)
+ * DCF manage drupal multi-sites with or without apache aliases automaticaly (http://example.com/alias)
 
 
 
