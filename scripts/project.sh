@@ -263,6 +263,17 @@ function deploy {
   if [ ! ${RETURN} = 0 ]; then
     exit 1
   fi
+  cd ${ABS_VENDOR_BIN_PATH}
+  if [ -f drush ]; then
+    for i in drush drush.php drush.launcher
+    do
+      sed "s|\"\${dir}/${i}\" \"|\"\${dir}/${i}\" --alias-path=${ABS_DCF_PATH}/drush/site-aliases \"|" $i > ${i}2
+      rm $i
+      mv ${i}2 $i
+    done
+    chmod 770 *
+  fi
+  cd ${ABS_DCF_PATH}
   chmod -R 550 ${SCRIPTS_PATH}
   #if [ ${IS_WINDOW} = true ]; then
     #correct bug of php + cygwin on windows
