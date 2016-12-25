@@ -279,6 +279,23 @@ function deploy {
     #echo "NPM install (dev)"
     #${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
   #fi
+  TEXT="#-----------------DCF CHANGE TO ORIGINAL DRUPAL .HTACCESS ------------------\n"
+  TEXT=${TEXT}"#----------------- To manage multi site wit aliases ------------------------\n"
+  TEXT=${TEXT}"RewriteCond %{REQUEST_FILENAME} -f [OR]\n"
+  TEXT=${TEXT}"RewriteCond %{REQUEST_FILENAME} -d [OR]\n"
+  TEXT=${TEXT}"RewriteCond %{REQUEST_URI} =/favicon.ico\n"
+  TEXT=${TEXT}"RewriteRule ^ - [L]\n"
+  TEXT=${TEXT}"#Do not remove below tag\n"
+  TEXT=${TEXT}"#DCF_MANAGER_TAG\n"
+  TEXT=${TEXT}"RewriteRule ^ index.php [L]\n"
+  TEXT=${TEXT}"#----------------------------- END DCF CHANGE  -----------------------------\n"
+  OLD="RewriteCond %{REQUEST_FILENAME} !-f\n"
+  OLD=${OLD}"RewriteCond %{REQUEST_FILENAME} !-d\n"
+  OLD=${OLD}"RewriteCond %{REQUEST_URI} !=/favicon.ico\n"
+  OLD=${OLD}"RewriteRule ^ index.php [L]\n"
+  sed "s|${OLD}|${TEXT}|" ${DOCUMENT_ROOT}/.htaccess > ${DOCUMENT_ROOT}/.htaccess2
+  rm ${DOCUMENT_ROOT}/.htaccess
+  mv ${DOCUMENT_ROOT}/.htaccess2 ${DOCUMENT_ROOT}/.htaccess
   example_local=${ABS_CONFIG_PATH}/${EXAMPLE}${LOCAL_CONF}
   example2_local=${ABS_CONFIG_PATH}"/<site_id>"${LOCAL_CONF}
   echo ""
@@ -293,6 +310,7 @@ function deploy {
 
 #
 # create sites.php in config
+# TODO: change it for drush plugin
 #
 create_sites() {
   if [ ! -e "${CONFIG_PATH}/sites.php" ]; then
@@ -303,6 +321,7 @@ create_sites() {
 
 #
 # create site directory
+# TODO: change it for drush plugin
 #
 create_site() {
   if [ ! -d "${SITE_DIR}" ]; then
