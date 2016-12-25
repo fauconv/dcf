@@ -319,11 +319,11 @@ create_site() {
   fi
   cd ${CONFIG_PATH}
   chmod 770 sites.php
-  sed "s|^.*${ID}.*$||g" sites.php > sites2.php
-  cp sites2.php sites.php
+  grep ${ID} sites.php -v > sites2.php
+  cp -f sites2.php sites.php
   for f in ${URL}
   do
-    sed "s|^.*${f}.*||g" sites.php > sites2.php
+    grep ${f} sites.php -v > sites2.php
     echo -n "\$sites[" >> sites2.php
     echo -n ${f}  >> sites2.php
     echo -n "] = '" >> sites2.php
