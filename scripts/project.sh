@@ -351,7 +351,8 @@ read_config() {
   source ${local_file}
   URL0=`echo $SITE_URLS | sed 's|,.*||g' | sed "s|'||g"`
   URL0_HTTP=`echo $URL0 | sed 's|http[s]*://||g' |sed 's|/.*||g'`
-  URL=`echo $SITE_URLS | sed 's|,| |g' | sed 's|http[s]*://||g' | sed 's|/|\.|g'`
+  URL_ALIAS=`echo $SITE_URLS | sed 's|,| |g' | sed 's|http[s]*://||g'`
+  URL=`echo $URL_ALIAS | sed 's|/|\.|g'`
 
   global_file=${ABS_CONFIG_PATH}/${ID}${GLOBAL_CONF}
   example_global=${ABS_CONFIG_PATH}/${EXAMPLE}${GLOBAL_CONF}
@@ -402,9 +403,28 @@ function get_lang() {
 }
 
 #
+# create htaccess for alias
+#
+function create_htaccess() {
+  for f in ${URL_ALIAS}
+  do
+    ALIAS=`echo ${f} | sed "|/.*|"`
+    if [ ! "${ALIAS}"="" ]; then
+      FOUND=`grep "/${ALIAS}/index.php" ${DOCUMENT_ROOT}/.htaccess`
+      if [ "$FOUND" = "" ]; then
+        TEXT="DCF_MANAGER_TAG\nRewriteCond %{REQUEST_URI} ^/${ALIAS}/\nRewriteRule ^ /${ALIAS}/index.php [L]\n"
+        sed "s|DCF_MANAGER_TAG|${TEXT}|" ${DOCUMENT_ROOT}/.htaccess > ${DOCUMENT_ROOT}/.htaccess2
+        rm ${DOCUMENT_ROOT}/.htaccess
+        mv ${DOCUMENT_ROOT}/.htaccess2 ${DOCUMENT_ROOT}/.htaccess
+      fi
+    fi
+  done
+}
+
+#
 # site deploy
 #
-function site_deploy {
+function site_deploy() {
   if [ "$2" = "" ]; then
       echo ""
       echo -e "\e[31m\e[1mSite id missing !\e[0m"
@@ -421,6 +441,7 @@ function site_deploy {
   read_config
   create_sites
   create_site
+  create_htaccess
   if [ "${LANG}" = "en" -o "${LANG}" = "EN" ]; then
     LOCAL=""
   else
