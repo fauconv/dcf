@@ -302,10 +302,9 @@ function deploy {
   TEXT=${TEXT}"#DCF_MANAGER_TAG\n"
   TEXT=${TEXT}"RewriteRule ^ index.php [L]\n"
   TEXT=${TEXT}"#----------------------------- END DCF CHANGE  -----------------------------\n"
-  OLD="RewriteCond %{REQUEST_FILENAME} !-f\n"
-  OLD=${OLD}"RewriteCond %{REQUEST_FILENAME} !-d\n"
-  OLD=${OLD}"RewriteCond %{REQUEST_URI} !=/favicon.ico\n"
-  OLD=${OLD}"RewriteRule ^ index.php [L]\n"
+  grep -v "RewriteCond %{REQUEST_FILENAME} " ${DOCUMENT_ROOT}/.htaccess > ${DOCUMENT_ROOT}/.htaccess2
+  grep -v "favicon.ico" ${DOCUMENT_ROOT}/.htaccess2 > ${DOCUMENT_ROOT}/.htaccess
+  OLD="^.* index.php \[.*$"
   sed "s|${OLD}|${TEXT}|" ${DOCUMENT_ROOT}/.htaccess > ${DOCUMENT_ROOT}/.htaccess2
   rm ${DOCUMENT_ROOT}/.htaccess
   mv ${DOCUMENT_ROOT}/.htaccess2 ${DOCUMENT_ROOT}/.htaccess
@@ -388,6 +387,7 @@ read_config() {
 
   global_file=${ABS_CONFIG_PATH}/${ID}${GLOBAL_CONF}
   example_global=${ABS_CONFIG_PATH}/${EXAMPLE}${GLOBAL_CONF}
+
   if [ ! -f ${global_file} ]; then
     echo ""
     echo -e "\e[31m\e[1mFile ${global_file} is missing create it by copy of ${example_global}\e[0m"
@@ -440,8 +440,9 @@ function get_lang() {
 function create_htaccess() {
   for f in ${URL_ALIAS}
   do
-    ALIAS=`echo ${f} | sed "|/.*|"`
-    if [ ! "${ALIAS}"="" ]; then
+    f=${f}/
+    ALIAS=`echo ${f} | sed "s|'||ig" | sed 's|[^/]*/||i' | sed 's|/||g'`
+    if [ ! "${ALIAS}" = "" ]; then
       FOUND=`grep "/${ALIAS}/index.php" ${DOCUMENT_ROOT}/.htaccess`
       if [ "$FOUND" = "" ]; then
         TEXT="DCF_MANAGER_TAG\nRewriteCond %{REQUEST_URI} ^/${ALIAS}/\nRewriteRule ^ /${ALIAS}/index.php [L]\n"
