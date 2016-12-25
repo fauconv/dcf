@@ -140,8 +140,7 @@ AddEncoding gzip svgz
   RewriteCond %{REQUEST_FILENAME} -d [OR]
   RewriteCond %{REQUEST_URI} =/favicon.ico
   RewriteRule ^ - [L]
-  #DCF_MANAGER ADDON----------------------------------------------------------
-  #DCF_MANAGER END ADDON -----------------------------------------------------
+  #DCF_MANAGER_TAG do not remove
   RewriteRule ^ index.php [L]
   #----------------------------- END DCF CHANGE  -----------------------------
 
