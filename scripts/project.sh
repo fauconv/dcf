@@ -217,7 +217,6 @@ function get {
   chmod -R 550 ${SCRIPTS_PATH}
   echo ""
   echo "Now use :"
-  echo "source ${SCRIPTS_PATH}/path.sh (optional)"
   echo "${SCRIPTS_PATH}/${SCRIPT_NAME} deploy dev <project name> [project description]\" to deploy DCF"
   echo ""
 }
@@ -305,6 +304,9 @@ function deploy {
   echo "   and fill it with your information"
   echo " - Then install your site by calling"
   echo "   ${ABS_SCRIPTS_PATH}/${SCRIPT_NAME} site deploy dev <site-id>"
+  echo ""
+  echo "Optionnaly you can call:"
+  echo "source ${SCRIPTS_PATH}/path.sh"
   echo ""
 }
 
