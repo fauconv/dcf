@@ -22,15 +22,4 @@ if [ "$VAR" = "" ]; then
   export PATH=${PATH_SCRIPT_PATH}:${PATH_VENDOR_BIN_PATH}:$PATH
 fi
 
-cd ${ABS_VENDOR_BIN_PATH}
-if [ -f drush ]; then
-  for i in drush drush.php drush.launcher
-  do
-    sed "s|\"\${dir}/${i}\" \"|\"\${dir}/${i}\" --alias-path=${ABS_DCF_PATH}/drush/site-aliases \"|" $i > ${i}2
-    rm $i
-    mv ${i}2 $i
-  done
-  chmod 770 *
-fi
-cd - > /dev/null
 echo "Done"
