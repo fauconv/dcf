@@ -6,6 +6,9 @@ This project is just a **SANDBOX** for the moment. **No stable version is provid
  * [Installation](#installation)
  * [Compatibility](#compatibility)
 
+[![Build Status](https://travis-ci.org/hechoendrupal/DrupalConsole.svg?branch=master)](https://travis-ci.org/hechoendrupal/DrupalConsole)
+[![Latest Unstable Version](https://poser.pugx.org/drupal/console/v/unstable.svg)](https://packagist.org/packages/drupal/console)
+[![Software License](https://img.shields.io/badge/license-GPL%202.0+-blue.svg)](https://packagist.org/packages/drupal/console)
 
 ## The goals are
 
