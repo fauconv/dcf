@@ -53,7 +53,8 @@
         "drupal/menu_admin_per_menu": "*",
         "drush/drush": "*",
         "drupal/plugin": "^2.4",
-        "idct/composer-custom-directory": "^1.0@dev"
+        "idct/composer-custom-directory": "^1.0@dev",
+        "drupal/console": "~1.0"
     },
     "require-dev": {
         "drupal/generator_ui": "1.x-dev",
