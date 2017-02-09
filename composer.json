@@ -83,7 +83,7 @@
         "drupal/console": "~1.0"
     },
     "require-dev": {
-        "drupal/devel"
+        "drupal/devel":"*",
         "drupal/generator_ui": "1.x-dev",
         "drupal/edit_ui": "1.x-dev",
         "drupal/libraries_ui": "1.x-dev",
