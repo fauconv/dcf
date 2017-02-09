@@ -58,6 +58,7 @@ DCF work on :
 
 DCF need installation of:
   * PHP 5.5.9 or higher [see drupal's PHP requirements](https://www.drupal.org/docs/7/system-requirements/php)
-  * a PHP web server (Nginx, Apache, IIS...) and PHP cli
+  * a PHP web server (Nginx, Apache, IIS, lightHttp...) and PHP cli
   [see drupal's Web Server requirements](https://www.drupal.org/docs/7/system-requirements/web-server)
   * a DataBase server (MySQL, MariaDB...) [see drupal's Database server requirements](https://www.drupal.org/docs/7/system-requirements/database-server)
+  * wget and bsdtar system package (for drush)
