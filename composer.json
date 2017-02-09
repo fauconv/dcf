@@ -25,6 +25,32 @@
             "type": "composer",
             "url": "https://packages.drupal.org/8"
         }
+        {
+            "type": "package",
+            "package": {
+                "name": "d3/d3",
+                "version": "v3.5.17",
+                "type": "drupal-library",
+                "source": {
+                    "url": "https://github.com/d3/d3",
+                    "type": "git",
+                    "reference": "v3.5.17"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "components/highlightjs",
+                "version": "9.7.0",
+                "type": "drupal-library",
+                "source": {
+                  "url": "https://github.com/components/highlightjs",
+                  "type": "git",
+                  "reference": "9.7.0"
+                }
+            }
+        }
     ],
     "require": {
         "php": "^5.5.9 || ^7.0",
@@ -57,6 +83,7 @@
         "drupal/console": "~1.0"
     },
     "require-dev": {
+        "drupal/devel"
         "drupal/generator_ui": "1.x-dev",
         "drupal/edit_ui": "1.x-dev",
         "drupal/libraries_ui": "1.x-dev",
@@ -64,6 +91,8 @@
         "drupal/restui": "^1.12",
         "drupal/module_builder": "3.x-dev",
         "drupal-code-builder/drupal-code-builder": "3.0.x-dev"
+        "d3/d3": "3.5.*",
+        "components/highlightjs": "9.7.*"
     },
     "conflict": {
         "drupal/drupal": "*"
