@@ -90,7 +90,7 @@
         "drupal/breakpoints_ui": "1.x-dev",
         "drupal/restui": "^1.12",
         "drupal/module_builder": "3.x-dev",
-        "drupal-code-builder/drupal-code-builder": "3.0.x-dev"
+        "drupal-code-builder/drupal-code-builder": "3.0.x-dev",
         "d3/d3": "3.5.*",
         "components/highlightjs": "9.7.*"
     },
