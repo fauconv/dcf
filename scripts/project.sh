@@ -161,7 +161,7 @@ function deploy {
   if [ "${IS_GET}" = "true" ]; then
     echo "retrive DCF..."
     cd ${ABS_DCF_PATH}
-    composer create-project ${DCF_NAME} -n --repository "{\"type\":\"vcs\", \"url\":\"${DCF_URL}\"}" -s $DCF_STABILITY
+    composer create-project ${DCF_NAME} -n --repository "{\"type\":\"vcs\", \"url\":\"${DCF_URL}\"}" -s $DCF_STABILITY --no-suggest
     if [ ! $? = 0 ]; then
       exit 1
     fi
@@ -170,6 +170,10 @@ function deploy {
     chmod -R 550 ${DOC_PATH}
     chmod -R 750 ${DOCUMENT_ROOT}
     chmod -R 750 ${SCRIPTS_PATH}
+    source ${SCRIPTS_PATH}/dcf/require
+    if [ "${1}" = "dev" ]; then
+      source ${SCRIPTS_PATH}/dcf/require_dev
+    fi
   fi
   
   #setup project
@@ -181,13 +185,14 @@ function deploy {
   sed "s|\"description\": \".*\"|\"description\": \"$3\"|" package.json2 > package.json
   rm composer.json2 package.json2
   
+  
  #retrive composer packages
-  cd ${ABS_DOCUMENT_ROOT}
+  cd ${ABS_DCF_PATH}
   if [ -f "composer.lock" ]; then
-    composer update $PROD --no-suggest
+    composer update $PROD --no-suggest -n
     RETURN=$?
   else
-    composer install $PROD --no-suggest
+    composer install $PROD --no-suggest -n
     RETURN=$?
   fi
   if [ ! ${RETURN} = 0 ]; then
