@@ -105,8 +105,8 @@ function nodeVersion {
 # composer
 #
 function composer {
-  dir=$(cd "${ABS_SCRIPTS_PATH}" && pwd)
-  if [[ $dir == /cygdrive/* && $(which php) == /cygdrive/* ]]; then    
+  dir=${ABS_SCRIPTS_PATH}
+  if command -v cygpath >/dev/null 2>&1; then    
       # cygwin paths for windows PHP must be translated
       dir=$(cygpath -m "$dir");    
   fi
@@ -161,7 +161,7 @@ function deploy {
   if [ "${IS_GET}" = "true" ]; then
     echo "retrive DCF..."
     cd ${ABS_DCF_PATH}
-    composer create-project ${DCF_NAME} -n --repository '{"type":"vcs", "url":"${DCF_URL}"}' -s $DCF_STABILITY
+    composer create-project ${DCF_NAME} -n --repository "{\"type\":\"vcs\", \"url\":\"${DCF_URL}\"}" -s $DCF_STABILITY
     if [ ! $? = 0 ]; then
       exit 1
     fi
