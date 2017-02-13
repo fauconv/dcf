@@ -102,6 +102,18 @@ function nodeVersion {
 }
 
 #
+# composer
+#
+function composer {
+  dir=$(cd "${ABS_SCRIPTS_PATH}" && pwd)
+  if [[ $dir == /cygdrive/* && $(which php) == /cygdrive/* ]]; then    
+      # cygwin paths for windows PHP must be translated
+      dir=$(cygpath -m "$dir");    
+  fi
+  php "${dir}/composer.phar" "$@"
+}
+
+#
 # check Composer exist
 #
 function checkConposer {
@@ -149,7 +161,7 @@ function deploy {
   if [ "${IS_GET}" = "true" ]; then
     echo "retrive DCF..."
     cd ${ABS_DCF_PATH}
-    ${ABS_SCRIPTS_PATH}/composer create-project ${DCF_NAME} -n --repository '{"type":"vcs", "url":"${DCF_URL}"}' -s $DCF_STABILITY
+    composer create-project ${DCF_NAME} -n --repository '{"type":"vcs", "url":"${DCF_URL}"}' -s $DCF_STABILITY
     if [ ! $? = 0 ]; then
       exit 1
     fi
@@ -172,10 +184,10 @@ function deploy {
  #retrive composer packages
   cd ${ABS_DOCUMENT_ROOT}
   if [ -f "composer.lock" ]; then
-    ${ABS_SCRIPTS_PATH}/composer update $PROD --no-suggest
+    composer update $PROD --no-suggest
     RETURN=$?
   else
-    ${ABS_SCRIPTS_PATH}/composer install $PROD --no-suggest
+    composer install $PROD --no-suggest
     RETURN=$?
   fi
   if [ ! ${RETURN} = 0 ]; then
