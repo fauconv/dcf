@@ -14,9 +14,9 @@
         "bin-dir": "vendor/bin",
         "vendor-dir": "vendor",
         "bin-compat": "full",
-        "home": "scripts/composer",
-        "cache-dir": "scripts/composer/cache",
-        "data-dir": "scripts/composer/data",
+        "home": "../scripts/composer",
+        "cache-dir": "../scripts/composer/cache",
+        "data-dir": "../scripts/composer/data",
         "apcu-autoloader": true,
         "optimize-autoloader": true
     },
@@ -24,7 +24,7 @@
         {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
-        }, 
+        },
         {
             "type": "package",
             "package": {
@@ -79,15 +79,15 @@
         "drupal/menu_admin_per_menu": "*",
         "drush/drush": "*",
         "drupal/plugin": "^2.4",
-        "idct/composer-custom-directory": "^1.0@dev",
+        "idct/composer-custom-directory": "^1.0",
         "drupal/console": "~1.0"
     },
     "require-dev": {
         "drupal/devel":"*",
-        "drupal/generator_ui": "1.x-dev",
-        "drupal/edit_ui": "1.x-dev",
-        "drupal/libraries_ui": "1.x-dev",
-        "drupal/breakpoints_ui": "1.x-dev",
+        "drupal/generator_ui": "~1.0",
+        "drupal/edit_ui": "~1.0",
+        "drupal/libraries_ui": "~1.0",
+        "drupal/breakpoints_ui": "~1.0",
         "drupal/restui": "^1.12",
         "drupal/module_builder": "3.x-dev",
         "drupal-code-builder/drupal-code-builder": "3.0.x-dev",
@@ -101,13 +101,13 @@
     "prefer-stable": true,
     "extra": {
         "installer-paths": {
-            "web/core": ["type:drupal-core"],
-            "web/libraries/{$name}": ["type:drupal-library"],
-            "web/modules/contrib/{$name}": ["type:drupal-module"],
-            "web/profiles/contrib/{$name}": ["type:drupal-profile"],
-            "web/themes/contrib/{$name}": ["type:drupal-theme"],
-            "drush/contrib/{$name}": ["type:drupal-drush"],
-            "web/libraries/drupal-code-builder": ["drupal-code-builder/drupal-code-builder"]
+            "core": ["type:drupal-core"],
+            "libraries/{$name}": ["type:drupal-library"],
+            "modules/contrib/{$name}": ["type:drupal-module"],
+            "profiles/contrib/{$name}": ["type:drupal-profile"],
+            "themes/contrib/{$name}": ["type:drupal-theme"],
+            "../drush/contrib/{$name}": ["type:drupal-drush"],
+            "libraries/drupal-code-builder": ["drupal-code-builder/drupal-code-builder"]
         }
     }
 }

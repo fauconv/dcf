@@ -12,7 +12,6 @@ dependencies:
   - menu_link_content
   - datetime
   - block_content
-  - quickedit
   - editor
   - image
   - options
@@ -20,11 +19,12 @@ dependencies:
   - page_cache
   - dynamic_page_cache
   - taxonomy
-  - toolbar
+  - admin_toolbar
   - file
   - rdf
   - views
   - automated_cron
+  - module_filter
 themes:
   - bartik
   - seven
