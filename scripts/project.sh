@@ -122,21 +122,21 @@ function checkConposer {
 function deploy {
   
   #check parameters
-  if [ "$2" = "" ]; then
+  if [ "${2}" = "" ]; then
       echo ""
       echo -e "\e[31m\e[1mProject's name missing !\e[0m"
       showHelp;
   fi
-  if [ "$1"="dev"]; then
+  if [ "${1}" = "dev" ]; then
     PROD=""
     DEV="--dev"
   else 
-    if [ "$1"="prod"]; then
+    if [ "${1}" = "prod" ]; then
       PROD="--no-dev"
       DEV=""
     else 
       echo ""
-      echo -e "parameter 2 must be 'dev' or 'prod'"
+      echo -e "parameter 2 must be 'dev' or 'prod'. $1 given"
       showHelp;
     fi
   fi
@@ -146,7 +146,7 @@ function deploy {
   checkConposer
   
   #retrive DCF
-  if [ "${IS_GET}"="true"]; then
+  if [ "${IS_GET}" = "true" ]; then
     echo "retrive DCF..."
     php ${SCRIPTS_PATH}/composer.phar create-project ${DCF_NAME} --no-interactive --repository '{"type":"vcs", "url":"${DCF_URL}"}' -s $DCF_STABILITY
     if [ ! $? = 0 ]; then
