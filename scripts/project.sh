@@ -38,17 +38,17 @@ IS_GET=false
 chmod 750 .
 if [ -f "${ABS_SCRIPT_PATH}/dcf/dcf_path" ]; then
   source ${ABS_SCRIPT_PATH}/dcf/dcf_path
-  cd ${ABS_DCF_PATH}
 else
   SCRIPTS_PATH=scripts #depth need to be only 1
   IS_GET=true
-  cd $ABS_SCRIPT_PATH
+  ABS_DCF_PATH=$ABS_SCRIPT_PATH
   ABS_SCRIPTS_PATH=${ABS_SCRIPT_PATH}/$SCRIPTS_PATH
   if [ ! -d ${ABS_SCRIPTS_PATH} ]; then
     mkdir ${ABS_SCRIPTS_PATH}
   fi
   chmod 750 ${ABS_SCRIPTS_PATH}
 fi
+cd ${ABS_DCF_PATH}
 
 #admin user
 ADMIN_NAME=developer
@@ -110,7 +110,6 @@ function checkConposer {
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
     php composer-setup.php
     rm composer-setup.php
-    cd $ABS_DCF_PATH
   else
     echo "Composer self install OK"
   fi
@@ -148,7 +147,7 @@ function deploy {
   #retrive DCF
   if [ "${IS_GET}" = "true" ]; then
     echo "retrive DCF..."
-    php ${SCRIPTS_PATH}/composer.phar create-project ${DCF_NAME} --no-interactive --repository '{"type":"vcs", "url":"${DCF_URL}"}' -s $DCF_STABILITY
+    php ${ABS_SCRIPTS_PATH}/composer.phar create-project ${DCF_NAME} -n --repository '{"type":"vcs", "url":"${DCF_URL}"}' -s $DCF_STABILITY
     if [ ! $? = 0 ]; then
       exit 1
     fi
