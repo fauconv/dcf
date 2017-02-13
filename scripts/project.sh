@@ -35,6 +35,7 @@ if [ "$ABS_SCRIPT_PATH" = "" ]; then
   ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 fi
 IS_GET=false
+chmod 750 .
 if [ -f "${ABS_SCRIPT_PATH}/dcf/dcf_path" ]; then
   source ${ABS_SCRIPT_PATH}/dcf/dcf_path
   cd ${ABS_DCF_PATH}
@@ -42,11 +43,12 @@ else
   SCRIPTS_PATH=scripts #depth need to be only 1
   IS_GET=true
   cd $ABS_SCRIPT_PATH
-  ${ABS_SCRIPTS_PATH}=${ABS_SCRIPT_PATH}/$SCRIPTS_PATH
-  mkdir $SCRIPTS_PATH
+  ABS_SCRIPTS_PATH=${ABS_SCRIPT_PATH}/$SCRIPTS_PATH
+  if [ ! -d ${ABS_SCRIPTS_PATH} ]; then
+    mkdir ${ABS_SCRIPTS_PATH}
+  fi
+  chmod 750 ${ABS_SCRIPTS_PATH}
 fi
-chmod 750 .
-chmod 750 ${ABS_SCRIPTS_PATH}
 
 #admin user
 ADMIN_NAME=developer
@@ -151,7 +153,7 @@ function deploy {
       exit 1
     fi
     source scripts/dcf/dcf_path
-    chmod 750 -R ${CONFIG_PATH}
+    chmod -R 750 ${CONFIG_PATH}
     chmod -R 550 ${DOC_PATH}
     chmod -R 750 ${DOCUMENT_ROOT}
     chmod -R 750 ${SCRIPTS_PATH}
