@@ -93,11 +93,12 @@ function showHelp {
 # display node version
 #
 function nodeVersion {
+  cd ${ABS_DCF_PATH}
   echo -n "Node version "
-  ${ABS_SCRIPTS_PATH}/node -v
+  ${SCRIPTS_PATH}/node -v
   echo -n "NPM version "
-  ${ABS_SCRIPTS_PATH}/npm -v
-  php ${ABS_SCRIPTS_PATH}/composer.phar -V
+  ${SCRIPTS_PATH}/npm -v
+  ${ABS_SCRIPTS_PATH}/composer -V
 }
 
 #
@@ -147,7 +148,8 @@ function deploy {
   #retrive DCF
   if [ "${IS_GET}" = "true" ]; then
     echo "retrive DCF..."
-    php ${ABS_SCRIPTS_PATH}/composer.phar create-project ${DCF_NAME} -n --repository '{"type":"vcs", "url":"${DCF_URL}"}' -s $DCF_STABILITY
+    cd ${ABS_DCF_PATH}
+    ${ABS_SCRIPTS_PATH}/composer create-project ${DCF_NAME} -n --repository '{"type":"vcs", "url":"${DCF_URL}"}' -s $DCF_STABILITY
     if [ ! $? = 0 ]; then
       exit 1
     fi
@@ -168,11 +170,12 @@ function deploy {
   rm composer.json2 package.json2
   
  #retrive composer packages
+  cd ${ABS_DOCUMENT_ROOT}
   if [ -f "composer.lock" ]; then
-    php ${ABS_SCRIPTS_PATH}/composer.phar update $PROD --no-suggest
+    ${ABS_SCRIPTS_PATH}/composer update $PROD --no-suggest
     RETURN=$?
   else
-    php ${ABS_SCRIPTS_PATH}/composer.phar install $PROD --no-suggest
+    ${ABS_SCRIPTS_PATH}/composer install $PROD --no-suggest
     RETURN=$?
   fi
   if [ ! ${RETURN} = 0 ]; then
