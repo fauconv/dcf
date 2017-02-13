@@ -35,17 +35,17 @@ This project is just a **SANDBOX** for the moment. **No stable version is provid
      * [here](https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh)
      * Or by using wget: `wget https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh`
      * Or using curl:
-
 ```
 curl -o project.sh https://raw.githubusercontent.com/fauconv/dcf/master/scripts/project.sh
 ```
+
  2. Place the script in the root directory of the future project. The document root of websites will be in `web` subdirectory. Exemple: if you place DCF Manager in `/var/www/dcf`, the DOCUMENT_ROOT of your web server must be set to `/var/www/dcf/web`
  3. Give execution right to DCF Manager: `chmod 700 project.sh`
- 4. Download DCF with the DCF Manager: `./project.sh get`
     Alternatively you can download directly DCF from github: https://github.com/fauconv/dcf
- 5. Deploy DCF: `./project.sh deploy dev "my project name" "my project description"`
- 6. Optionaly launch `source scripts/path.sh` to set environment path for DCF. Environment is only set for your current session, no side effect. You must launch it eachtime you open a terminal or place this command line in your .bashrc file
- 7. create a new drupal site: `scripts/project.sh site deploy dev my_site_id`
+ 4. Deploy DCF: `./project.sh deploy dev "my project"`
+ 5. Optionaly launch `source scripts/path.sh` to set environment path for DCF. Environment is only set for your current session, no side effect. You must launch it eachtime you open a terminal or place this command line in your .bashrc file
+ 6. in `config` directory create a global config fil and a local config file for your site by using the samples file and a my_site_id
+ 7. create a new drupal site: `scripts/project.sh site deploy my_site_id`
  8. Read [wokflow documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_workflow.md) and [general documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_documentation.md) for more information
 
 
