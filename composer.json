@@ -11,12 +11,12 @@
         }
     ],
     "config": {
-        "bin-dir": "vendor/bin",
-        "vendor-dir": "vendor",
+        "bin-dir": "web/vendor/bin",
+        "vendor-dir": "web/vendor",
         "bin-compat": "full",
-        "home": "../scripts/composer",
-        "cache-dir": "../scripts/composer/cache",
-        "data-dir": "../scripts/composer/data",
+        "home": "scripts/composer",
+        "cache-dir": "scripts/composer/cache",
+        "data-dir": "scripts/composer/data",
         "apcu-autoloader": true,
         "optimize-autoloader": true
     },
@@ -71,8 +71,7 @@
         "ext-xml": "*",
         "composer/installers": "^1.0.20",
         "cweagans/composer-patches": "^1.0",
-        "drupal-composer/drupal-scaffold": "^2.0.1",
-        "drupal/core": "~8.0",
+        "drupal/drupal": "~8.0",
         "drupal/admin_toolbar": "*",
         "drupal/composer_manager": "1.x-dev",
         "drupal/module_filter": "*",
@@ -94,20 +93,18 @@
         "d3/d3": "3.5.*",
         "components/highlightjs": "9.7.*"
     },
-    "conflict": {
-        "drupal/drupal": "*"
-    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "extra": {
         "installer-paths": {
-            "core": ["type:drupal-core"],
-            "libraries/{$name}": ["type:drupal-library"],
-            "modules/contrib/{$name}": ["type:drupal-module"],
-            "profiles/contrib/{$name}": ["type:drupal-profile"],
-            "themes/contrib/{$name}": ["type:drupal-theme"],
-            "../drush/contrib/{$name}": ["type:drupal-drush"],
-            "libraries/drupal-code-builder": ["drupal-code-builder/drupal-code-builder"]
+            "web/core": ["type:drupal-core"],
+            "web/libraries/{$name}": ["type:drupal-library"],
+            "web/modules/contrib/{$name}": ["type:drupal-module"],
+            "web/profiles/contrib/{$name}": ["type:drupal-profile"],
+            "web/themes/contrib/{$name}": ["type:drupal-theme"],
+            "drush/contrib/{$name}": ["type:drupal-drush"],
+            "web/libraries/drupal-code-builder": ["drupal-code-builder/drupal-code-builder"],
+            "web": ["drupal/drupal"]
         }
     }
 }
