@@ -12,12 +12,12 @@ CONFIG_PATH=config
 DOCUMENT_ROOT=web
 SITES_PATH=${DOCUMENT_ROOT}/sites #if change update sites.php
 DOC_PATH=docs
-VENDOR_PATH=${DOCUMENT_ROOT}/vendor
+VENDOR_PATH=vendor
 VENDOR_BIN_PATH=${VENDOR_PATH}/bin
 SCRIPTS_PATH=scripts #if change update project.sh file
 FILES_PATH=files
 TRANSLATIONS_PATH=${FILES_PATH}/translations
-DRUSH_CONFIG=/drush
+DRUSH_CONFIG=drush
 DRUSH_ALIAS=${DRUSH_CONFIG}/site-aliases
 
 PATH_SCRIPT_PATH=$ABS_SCRIPT_PATH

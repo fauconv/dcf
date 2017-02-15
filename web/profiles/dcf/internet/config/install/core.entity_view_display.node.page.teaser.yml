@@ -7,7 +7,6 @@ dependencies:
     - node.type.page
   module:
     - text
-    - user
 id: node.page.teaser
 targetEntityType: node
 bundle: page

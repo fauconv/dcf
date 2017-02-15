@@ -65,7 +65,7 @@ function read_config {
     exit 1
   fi
   source ${local_file}
-  if [ "${SITE_URLS}" = "" ] || ["${DATABASE}" = ""] || ["${DATABASE}" = "mysql://db_user:db_password@localhost:3306/db_name"] || ["${ADMIN_MAIL}" = ""]; then
+  if [ "${SITE_URLS}" = "" ] || [ "${DATABASE}" = "" ] || [ "${DATABASE}" = "mysql://db_user:db_password@localhost:3306/db_name" ] || [ "${ADMIN_MAIL}" = "" ]; then
     echo ""
     echo -e "\e[31m\e[1mFile ${global_file} is empty\e[0m"
     echo ""
@@ -86,9 +86,9 @@ function read_config {
     exit 1
   fi
   source ${global_file}
-  if [ "${SITE_NAME}" = "" ] || [ "${LANG}" = "" ] || [ "${PROFIL}" = "" ]; then
+  if [ "${SITE_NAME}" = "" ] || [ "${LANG}" = "" ] || [ "${PROFIL}" = "" ] ; then
     echo ""
-    echo -e "\e[31m\e[1mFile ${global_file} is empty\e[0m"
+    echo -e "\e[31m\e[1mFile ${global_file} is empty or wrong values\e[0m"
     echo ""
     exit 1
   fi
@@ -155,7 +155,7 @@ function site_deploy {
       echo -e "\e[31m\e[1mSite id missing !\e[0m"
       showHelp;
   fi
-  ID=`echo $2 | sed 's|[^a-z]+||g'`
+  ID=`echo $1 | sed 's|[^a-z]+||g'`
   if [ "$ID" = "" ]; then
       echo ""
       echo -e "\e[31m\e[1mSite id can only contain lowercase !\e[0m"
@@ -174,9 +174,9 @@ function site_deploy {
     LOCAL="--locale=\"${LANG}\""
     get_lang
   fi
-  cd $DOCUMENT_ROOT
-  #echo "${ABS_VENDOR_BIN_PATH}/drush.php site-install $SITE_TYPE -y --root=\"${ABS_DOCUMENT_ROOT}\" $LOCAL --account-name=\"developer\" --account-mail=\"${ADMIN_MAIL}\" --site-mail=\"no-reply@${URL0_HTTP}\" --site-name=\"${SITE_NAME}\" --sites-subdir=\"${ID}\" --db-url=\"${DATABASE}\""
-  ${ABS_VENDOR_BIN_PATH}/drush.php site-install $SITE_TYPE -y --root="${ABS_DOCUMENT_ROOT}" $LOCAL --account-name="${ADMIN_NAME}" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
+  cd $ABS_DOCUMENT_ROOT
+  #echo "${ABS_VENDOR_BIN_PATH}/drush.php site-install $PROFIL -y --root=\"${ABS_DOCUMENT_ROOT}\" $LOCAL --account-name=\"developer\" --account-mail=\"${ADMIN_MAIL}\" --site-mail=\"no-reply@${URL0_HTTP}\" --site-name=\"${SITE_NAME}\" --sites-subdir=\"${ID}\" --db-url=\"${DATABASE}\""
+  ${ABS_VENDOR_BIN_PATH}/drush.php site-install $PROFIL -y --root="${ABS_DOCUMENT_ROOT}" $LOCAL --account-name="${ADMIN_NAME}" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
   cd $ABS_DCF_PATH
   create_drush_alias
   echo ""

@@ -25,6 +25,7 @@ dependencies:
   - views
   - automated_cron
   - module_filter
+  - pathauto
 themes:
   - bartik
   - seven
