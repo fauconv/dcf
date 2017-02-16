@@ -20,12 +20,16 @@ dependencies:
   - dynamic_page_cache
   - taxonomy
   - admin_toolbar
+  - admin_toolbar_tools
   - file
   - rdf
   - views
   - automated_cron
   - module_filter
   - pathauto
+  - content_moderation
+  - menu_admin_per_menu
+  - responsive_image
 themes:
   - bartik
   - seven
