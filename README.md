@@ -33,15 +33,16 @@ This project is just a **SANDBOX** for the moment. **No stable version is provid
 
  1. Download DCF:
      * directly on github
-     * or using git (dont forget to remove the .git directory)
+     * or using git
+     `git clone --depth 1 https://github.com/fauconv/dcf.git; rm -rf .git`
      * or if you already have composer you can use it : 
      `composer create-project fauconv/dcf -n --repository "{\"type\":\"vcs\", \"url\":\"https://github.com/fauconv/dcf\"}" -s dev`
  2. The document root of websites will be in `web` subdirectory. Exemple: if you place DCF in `/var/www/dcf`, the DOCUMENT_ROOT of your web server must be set to `/var/www/dcf/web`
- 3. Deploy DCF: `scripts/project.sh deploy dev "my project"`
+ 3. Deploy DCF: `scripts/project.sh deploy dev`
  4. Optionaly launch `source scripts/path.sh` to set environment path for DCF. Environment is only set for your current session, no side effect. You must launch it eachtime you open a terminal or place this command line in your .bashrc file
- 5. in `config` directory create a global config fil and a local config file for your site by using the samples file and a my_site_id
+ 5. in `config` directory create a global config file and a local config file named my_site_id.config.global.ini and my_site_id.config.local.ini for your site by using the samples file. my_site_id, is a unique id freely choosen in space: [a-z_]+. In global config file you can choose between 2 profile provided by DCF "internet" or "intranet". You can also create your own profile or use standard drupal profiles.
  6. create a new drupal site: `scripts/project.sh site deploy my_site_id`
- 7. Read [wokflow documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_workflow.md) and [general documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_documentation.md) for more information
+ 7. Read [workflow documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_workflow.md) and [general documentation](https://raw.githubusercontent.com/fauconv/dcf/master/docs/DCF_8_documentation.md) for more information
 
 
 ## Compatibility
