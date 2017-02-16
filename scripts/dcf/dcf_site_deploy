@@ -133,7 +133,7 @@ function create_htaccess {
   for f in ${URL_ALIAS}
   do
     f=${f}/
-    ALIAS=`echo ${f} | sed "s|'||ig" | sed 's|[^/]*/||i' | sed 's|/||g'`
+    ALIAS=`echo ${f} | sed "s|'||ig" | sed 's|[^/]*/||i' | sed 's|/$||g'`
     if [ ! "${ALIAS}" = "" ]; then
       FOUND=`grep "/${ALIAS}/index.php" .htaccess`
       if [ "$FOUND" = "" ]; then
