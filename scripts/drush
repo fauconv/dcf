@@ -1,0 +1,46 @@
+#!/usr/bin/env sh
+#
+# DRUSH WRAPPER
+#
+# A wrapper script which launches the Drush that is in your project's /vendor
+# directory.  Copy it to the root of your project and edit as desired.
+# You may rename this script to 'drush', if doing so does not cause a conflict
+# (e.g. with a folder __ROOT__/drush).
+#
+# Below are options which you might want to add. More info at
+# `drush topic core-global-options`:
+#
+# --local       Only discover commandfiles/site aliases/config that are
+#               inside your project dir.
+# --alias-path  A list of directories where Drush will search for site
+#               alias files.
+# --config      A list of paths to config files
+# --include     A list of directories to search for commandfiles.
+#
+# Note that it is recommended to use --local when using a drush
+# wrapper script.
+#
+# See the 'drush' script in the Drush installation root (../drush) for
+# an explanation of the different 'drush' scripts.
+#
+# IMPORTANT:  Modify the path below if your 'vendor' directory has been
+# relocated to another location in your composer.json file.
+# `../vendor/bin/drush.launcher --local $@` is a common variant for
+# composer-managed Drupal sites.
+#
+SOURCE_PATH='ctm'
+SOURCE_SCRIPT='ctm_path'
+
+ABS_SCRIPT_PATH=$(dirname `readlink -e $0`);
+if [ "$ABS_SCRIPT_PATH" = "" ]; then
+  ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
+fi
+if [ ! -f "${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}" ]; then
+  echo ""
+  echo -e "\e[31m\e[1mCTM is not correctly installed\e[0m"
+  echo ""
+  exit 1
+fi
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}
+
+php ${ABS_DRUSH_PATH}/drush.php "$@" --root=${ABS_DOCUMENT_ROOT} --alias-path=${ABS_DRUSH_ALIAS} --config=${ABS_DRUSH_CONFIG} --include=${ABS_DRUSH_CONFIG}

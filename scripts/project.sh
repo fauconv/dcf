@@ -6,20 +6,14 @@
 #| Batch to Manage the entire multi-site/farm/factory/project|
 #|                                                           |
 #+-----------------------------------------------------------+
-#| version : ${VERSION_SCRIPT}                               |
+#| version : VERSION_SCRIPT                                |
 #+-----------------------------------------------------------+
 
 #
 # const
 #
-VERSION_SCRIPT="0.1.0"
-ADMIN_NAME=developer
-DCF_SCRIPTS_PATH='dcf'
-
-#dcf file names
-LOCAL_CONF=.config.local.ini
-GLOBAL_CONF=.config.global.ini
-EXAMPLE=example
+SOURCE_PATH='dcf'
+SOURCE_SCRIPT='dcf_path'
 
 #DCF paths
 SCRIPT_NAME=$(basename $0)
@@ -27,17 +21,17 @@ ABS_SCRIPT_PATH=$(dirname `readlink -e $0`);
 if [ "$ABS_SCRIPT_PATH" = "" ]; then
   ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 fi
-if [ ! -f "${ABS_SCRIPT_PATH}/dcf/dcf_path" ]; then
+if [ ! -f "${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}" ]; then
   echo ""
   echo -e "\e[31m\e[1mDCF is not correctly installed\e[0m"
   echo ""
   exit 1
 fi
-source ${ABS_SCRIPT_PATH}/${DCF_SCRIPTS_PATH}/dcf_path
-cd ${ABS_DCF_PATH}
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}
+cd ${ABS_ROOT_PATH}
 
 #
-# showHelp
+# display help
 #
 function showHelp {
   echo ""
@@ -103,9 +97,9 @@ function nodeVersion {
 #
 function composer {
   dir=${ABS_SCRIPTS_PATH}
-  if command -v cygpath >/dev/null 2>&1; then    
+  if command -v cygpath >/dev/null 2>&1; then
       # cygwin paths for windows PHP must be translated
-      dir=$(cygpath -m "$dir");    
+      dir=$(cygpath -m "$dir");
   fi
   php "${dir}/composer.phar" "$@"
 }
@@ -119,7 +113,7 @@ function setRight {
         chmod -R 770 ${f}/files
     fi
 done
-  else 
+  else
     chmod -R 770 .
   fi
 }

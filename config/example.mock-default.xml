@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MOCK>
+  <USERNAME>MOCK</USERNAME>
+  <EMAIL>mock@example.com</EMAIL>
+  <FIELDS>
+    <FULLNAME>MOC Kevin</FULLNAME>
+    <NAME>MOC</NAME>
+    <FIRSTNAME>Kevin</FIRSTNAME>
+    <LANG>FR</LANG>
+  </FIELDS>
+  <ROLES>
+    <ROLE>developer</ROLE>
+  </ROLES>
+</MOCK>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MASQUERADE>
+  <USER>
+    <USERNAME>admin_site_mqe</USERNAME>
+    <EMAIL>site_mqe@example.com</EMAIL>
+    <FIELDS>
+      <FULLNAME>Generic Admin Site</FULLNAME>
+      <NAME>Generic</NAME>
+      <FIRSTNAME>Admin Site</FIRSTNAME>
+      <LANG>FR</LANG>
+    </FIELDS>
+    <ROLES>
+      <ROLE>administrator</ROLE>
+    </ROLES>
+  </USER>
+  <USER>
+    <USERNAME>contributor_mqe</USERNAME>
+    <EMAIL>contrib_mqe@example.com</EMAIL>
+    <FIELDS>
+      <FULLNAME>Generic Contributor</FULLNAME>
+      <NAME>Generic</NAME>
+      <FIRSTNAME>Contributor</FIRSTNAME>
+      <LANG>FR</LANG>
+    </FIELDS>
+    <ROLES>
+      <ROLE>contributor</ROLE>
+    </ROLES>
+  </USER>
+  <USER>
+    <USERNAME>reader_mqe</USERNAME>
+    <EMAIL>reader_mqe@example.com</EMAIL>
+    <FIELDS>
+      <FULLNAME>Generic reader</FULLNAME>
+      <NAME>Generic</NAME>
+      <FIRSTNAME>reader</FIRSTNAME>
+      <LANG>FR</LANG>
+    </FIELDS>
+    <ROLES>
+      <ROLE>reader</ROLE>
+    </ROLES>
+  </USER>
+</MASQUERADE>

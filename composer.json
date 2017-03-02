@@ -11,8 +11,8 @@
         }
     ],
     "config": {
-        "bin-dir": "vendor/bin",
-        "vendor-dir": "vendor",
+    	"bin-dir": "scripts/vendor/bin",
+    	"vendor-dir": "scripts/vendor",
         "bin-compat": "full",
         "home": "scripts/composer",
         "cache-dir": "scripts/composer/cache",
