@@ -19,7 +19,7 @@ source ${ABS_SCRIPT_PATH}/dcf/dcf_path
 
 VAR=`echo $PATH | grep "${PATH_SCRIPT_PATH}:"`
 if [ "$VAR" = "" ]; then
-  export PATH=${PATH_SCRIPT_PATH}:${PATH_VENDOR_BIN_PATH}:$PATH
+  export PATH=${PATH_SCRIPT_PATH}:$PATH
 fi
 
 echo "Done"

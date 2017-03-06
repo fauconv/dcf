@@ -2,6 +2,8 @@
 #+-----------------------------------------------------------+
 #|                                                           |
 #| code for the site deploy command                          |
+#| TODO : split settings.phpand set environment variable     |
+#|        (or use index var)                                 |
 #|                                                           |
 #+-----------------------------------------------------------+
 #| version : 1                                               |
@@ -14,6 +16,7 @@
 function create_sites {
   if [ ! -e "${ABS_CONFIG_PATH}/sites.php" ]; then
     echo "<?php" > ${ABS_CONFIG_PATH}/sites.php
+    chmod 777 ${ABS_CONFIG_PATH}/sites.php
   fi
 }
 
@@ -22,15 +25,20 @@ function create_sites {
 # TODO: change it for drush plugin
 #
 function create_site {
-  if [ ! -d "${ABS_SITE_DIR}" ]; then
+  if [ ! -d "${ABS_SITE_PATH}" ]; then
     echo "Create site directory..."
-    cp -r ${ABS_SITES_PATH}/default $ABS_SITE_DIR
-    chmod -R 770 $ABS_SITE_DIR
-    mv ${ABS_SITE_DIR}/default.settings.php ${ABS_SITE_DIR}/settings.php
+    cp -r ${ABS_SITES_PATH}/default ${ABS_SITE_PATH}
+    cp -R  ${ABS_MEDIAS_PATH}/default ${ABS_MEDIA_PATH}
+    chmod -R 777 ${ABS_SITE_PATH} ${ABS_MEDIA_PATH}
+    mv ${ABS_SITE_PATH}/default.settings.php ${ABS_SITE_PATH}/settings.php
   else
     echo "Reinitializing site settings..."
-    rm ${ABS_SITE_DIR}/settings.php
-    cp ${ABS_SITE_DIR}/../default/default.settings.php ${ABS_SITE_DIR}/settings.php
+    rm ${ABS_SITE_PATH}/settings.php
+    cp ${ABS_SITE_PATH}/../default/default.settings.php ${ABS_SITE_PATH}/settings.php
+    if [ ! -d ${ABS_MEDIA_PATH} ]; then
+      cp -R  ${ABS_MEDIAS_PATH}/default ${ABS_MEDIA_PATH}
+    fi
+    chmod -R 777 ${ABS_MEDIA_PATH}
   fi
   cd ${ABS_CONFIG_PATH}
   grep ${ID} sites.php -v > sites2.php
@@ -46,7 +54,6 @@ function create_site {
     cp sites2.php sites.php
   done
   rm -f sites2.php
-  chmod 550 sites.php
   cd ${ABS_DCF_PATH}
 }
 
@@ -71,10 +78,6 @@ function read_config {
     echo ""
     exit 1
   fi
-  URL0=`echo $SITE_URLS | sed 's|,.*||g' | sed "s|'||g"`
-  URL0_HTTP=`echo $URL0 | sed 's|http[s]*://||g' |sed 's|/.*||g'`
-  URL_ALIAS=`echo $SITE_URLS | sed 's|,| |g' | sed 's|http[s]*://||g'`
-  URL=`echo $URL_ALIAS | sed 's|/|\.|g'`
   
   #global
   global_file=${ABS_CONFIG_PATH}/${ID}${GLOBAL_CONF}
@@ -92,6 +95,7 @@ function read_config {
     echo ""
     exit 1
   fi
+  source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_url
 }
 
 #
@@ -162,12 +166,15 @@ function site_deploy {
       echo ""
       exit 1
   fi
-  SITE_DIR=${SITES_PATH}/$ID
-  ABS_SITE_DIR=${ABS_SITES_PATH}/$ID
+  SITE_PATH=${SITES_PATH}/$ID
+  ABS_SITE_PATH=${ABS_SITES_PATH}/$ID
+  ABS_MEDIA_PATH=${ABS_MEDIAS_PATH}/$ID
   read_config
+  setRight dev
   create_sites
   create_site
   create_htaccess
+  create_drush_alias
   if [ "${LANG}" = "en" -o "${LANG}" = "EN" ]; then
     LOCAL=""
   else
@@ -178,7 +185,7 @@ function site_deploy {
   #echo "${ABS_VENDOR_BIN_PATH}/drush.php site-install $PROFIL -y --root=\"${ABS_DOCUMENT_ROOT}\" $LOCAL --account-name=\"developer\" --account-mail=\"${ADMIN_MAIL}\" --site-mail=\"no-reply@${URL0_HTTP}\" --site-name=\"${SITE_NAME}\" --sites-subdir=\"${ID}\" --db-url=\"${DATABASE}\""
   ${ABS_VENDOR_BIN_PATH}/drush.php site-install $PROFIL -y --root="${ABS_DOCUMENT_ROOT}" $LOCAL --account-name="${ADMIN_NAME}" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
   cd $ABS_DCF_PATH
-  create_drush_alias
+  setRight $ENVI
   echo ""
   echo "DONT FORGET TO NOTE the administrator password display above this message"
 }

@@ -6,16 +6,12 @@
 #| Batch to Manage the entire multi-site/farm/factory/project|
 #|                                                           |
 #+-----------------------------------------------------------+
-#| version : VERSION_SCRIPT                                |
+#| version : VERSION_SCRIPT                                  |
 #+-----------------------------------------------------------+
 
-#
-# const
-#
+#DCF paths and init
 SOURCE_PATH='dcf'
 SOURCE_SCRIPT='dcf_path'
-
-#DCF paths
 SCRIPT_NAME=$(basename $0)
 ABS_SCRIPT_PATH=$(dirname `readlink -e $0`);
 if [ "$ABS_SCRIPT_PATH" = "" ]; then
@@ -28,6 +24,11 @@ if [ ! -f "${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}" ]; then
   exit 1
 fi
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_deploy
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_site_deploy
+if [ -f ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/env ]; then
+  source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/env
+fi
 cd ${ABS_ROOT_PATH}
 
 #
@@ -84,7 +85,7 @@ function showHelp {
 # display node version
 #
 function nodeVersion {
-  cd ${ABS_DCF_PATH}
+  cd ${ABS_ROOT_PATH}
   echo -n "Node version "
   ${SCRIPTS_PATH}/node -v
   echo -n "NPM version "
@@ -93,28 +94,16 @@ function nodeVersion {
 }
 
 #
-# composer
-#
-function composer {
-  dir=${ABS_SCRIPTS_PATH}
-  if command -v cygpath >/dev/null 2>&1; then
-      # cygwin paths for windows PHP must be translated
-      dir=$(cygpath -m "$dir");
-  fi
-  php "${dir}/composer.phar" "$@"
-}
-
 #set access right
+#
 function setRight {
   if [ "$1" = "prod" ]; then
-    chmod -R 550 ${ABS_DCF_PATH}
-    for f in ${ABS_SITES_PATH}/*; do
-    if [ -d ${f}/files ]; then
-        chmod -R 770 ${f}/files
-    fi
-done
+    chmod -R 550 ${ABS_ROOT_PATH}
+    for f in ${ABS_MEDIAS_PATH}/*; do
+      chmod -R 770 ${f}
+    done
   else
-    chmod -R 770 .
+    chmod -R 770 ${ABS_ROOT_PATH}
   fi
 }
 
@@ -130,6 +119,19 @@ function checkConposer {
     rm composer-setup.php
   else
     echo "Composer self install OK"
+  fi
+}
+
+#
+# check php exist and accessible
+#
+function checkPhp {
+  echo "CheckPhp:"
+  if command -v php &>/dev/null; then
+    echo "PHP detected"
+  else
+    echo -e "\e[31m\e[1mPHP absent or unreachable\e[0m"
+    exit 1
   fi
 }
 
@@ -149,32 +151,37 @@ function checkConposer {
 if [ "$1" = "" ]; then
     showHelp
 fi
-
-case $1 in
-  deploy )
-          source ${ABS_SCRIPT_PATH}/${DCF_SCRIPTS_PATH}/dcf_deploy
-          deploy "$2"
+checkPhp
+while true; do
+  case $1 in
+    deploy )
+      deploy "$2"
+      shift;
+      ;;
+    site )
+      case $2 in
+        deploy )
+          site_deploy "$3"
+          shift;
           ;;
-  site )
-          case $2 in
-            deploy )
-                  source ${ABS_SCRIPT_PATH}/${DCF_SCRIPTS_PATH}/dcf_site_deploy
-                  site_deploy "$3"
-                  ;;
-            rebuild )
-                  site_rebuild "$3" "$4"
-                  ;;
-            * )
-                  echo ""
-                  echo -e "\e[31m\e[1mUnknown command : $1 $2 !\e[0m"
-                  showHelp
-                  ;;
-          esac
-          ;;
-  * )
+        * )
           echo ""
-          echo -e "\e[31m\e[1mUnknown command : $1 !\e[0m"
+          echo -e "\e[31m\e[1mUnknown command : $1 $2 !\e[0m"
           showHelp
           ;;
-esac
+      esac
+      shift;
+      ;;
+    "")
+      break
+      ;;
+    * )
+      echo ""
+      echo -e "\e[31m\e[1mUnknown command : $1 !\e[0m"
+      showHelp
+      break
+      ;;
+  esac
+  shift;
+done
 exit 0

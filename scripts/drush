@@ -28,9 +28,8 @@
 # `../vendor/bin/drush.launcher --local $@` is a common variant for
 # composer-managed Drupal sites.
 #
-SOURCE_PATH='ctm'
-SOURCE_SCRIPT='ctm_path'
-
+SOURCE_PATH='dcf'
+SOURCE_SCRIPT='dcf_path'
 ABS_SCRIPT_PATH=$(dirname `readlink -e $0`);
 if [ "$ABS_SCRIPT_PATH" = "" ]; then
   ABS_SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)

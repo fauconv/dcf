@@ -11,41 +11,44 @@
 # deploy
 #
 function deploy {
-  
+
   #check parameters
   if [ "${1}" = "dev" ]; then
     PROD=""
     DEV="--dev"
-  else 
+    ENVI="dev"
+  else
     if [ "${1}" = "prod" ]; then
       PROD="--no-dev"
       DEV=""
-    else 
+      ENVI="prod"
+    else
       echo ""
       echo -e "parameter 2 must be 'dev' or 'prod'. $1 given"
       showHelp;
     fi
   fi
-  
+  echo "ENVI=${ENVI}" > ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/env
+
   #set right
   setRight dev;
-  
+
   #checkcomposer
   checkConposer
-  
+
   #update DCF
-  cd ${ABS_DCF_PATH}
+  cd ${ABS_ROOT_PATH}
   if [ -f "composer.lock" ]; then
-    composer update $PROD --no-suggest -n
+    php ${ABS_SCRIPTS_PATH}/composer.phar update $PROD --no-suggest -n
     RETURN=$?
   else
-    composer install $PROD --no-suggest -n
+    php ${ABS_SCRIPTS_PATH}/composer.phar install $PROD --no-suggest -n
     RETURN=$?
   fi
   if [ ! ${RETURN} = 0 ]; then
     exit 1
   fi
-  
+
   #update htaccess file
   cd ${ABS_DOCUMENT_ROOT}
   TEXT="#-----------------DCF CHANGE TO ORIGINAL DRUPAL .HTACCESS ------------------\n"
@@ -64,13 +67,13 @@ function deploy {
   sed "s|${OLD}|${TEXT}|" .htaccess > .htaccess2
   rm .htaccess
   mv .htaccess2 .htaccess
-  
+
   #update index.php
   cd ${ABS_DOCUMENT_ROOT}
   sed "s|prod|$1|" index.php > index.php2
   rm index.php
   mv index.php2 index.php
-  
+
   #message
   example_local=${ABS_CONFIG_PATH}/${EXAMPLE}${LOCAL_CONF}
   example2_local=${ABS_CONFIG_PATH}"/<site_id>"${LOCAL_CONF}
