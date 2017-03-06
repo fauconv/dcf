@@ -61,7 +61,7 @@ function create_site {
 # read configuration files for a site
 #
 function read_config {
-  
+
   #local
   local_file=${ABS_CONFIG_PATH}/${ID}${LOCAL_CONF}
   if [ ! -f ${local_file} ]; then
@@ -78,7 +78,7 @@ function read_config {
     echo ""
     exit 1
   fi
-  
+
   #global
   global_file=${ABS_CONFIG_PATH}/${ID}${GLOBAL_CONF}
   if [ ! -f ${global_file} ]; then
@@ -182,8 +182,7 @@ function site_deploy {
     get_lang
   fi
   cd $ABS_DOCUMENT_ROOT
-  #echo "${ABS_VENDOR_BIN_PATH}/drush.php site-install $PROFIL -y --root=\"${ABS_DOCUMENT_ROOT}\" $LOCAL --account-name=\"developer\" --account-mail=\"${ADMIN_MAIL}\" --site-mail=\"no-reply@${URL0_HTTP}\" --site-name=\"${SITE_NAME}\" --sites-subdir=\"${ID}\" --db-url=\"${DATABASE}\""
-  ${ABS_VENDOR_BIN_PATH}/drush.php site-install $PROFIL -y --root="${ABS_DOCUMENT_ROOT}" $LOCAL --account-name="${ADMIN_NAME}" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
+  ${ABS_SCRIPTS_PATH}/drush site-install $PROFIL -y $LOCAL --account-name="${ADMIN_NAME}" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
   cd $ABS_DCF_PATH
   setRight $ENVI
   echo ""

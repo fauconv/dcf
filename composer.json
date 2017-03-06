@@ -11,12 +11,12 @@
         }
     ],
     "config": {
-    	"bin-dir": "scripts/vendor/bin",
-    	"vendor-dir": "scripts/vendor",
+    	"bin-dir": "vendor/bin",
+    	"vendor-dir": "vendor",
         "bin-compat": "full",
         "home": "scripts/composer",
-        "cache-dir": "scripts/composer/cache",
-        "data-dir": "scripts/composer/data",
+        "cache-dir": "composer_cache/cache",
+        "data-dir": "composer_cache/data",
         "apcu-autoloader": true,
         "optimize-autoloader": true
     },
@@ -111,18 +111,7 @@
             "web/libraries/drupal-code-builder": ["drupal-code-builder/drupal-code-builder"]
         }
     },
-    "autoload": {
-        "classmap": [
-            "scripts/dcf/composer/ScriptHandler.php"
-        ]
-    },
     "scripts": {
-      "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
-      "post-install-cmd": [
-          "DCF\\ScriptHandler::postInstall"
-      ],
-      "post-update-cmd": [
-          "DCF\\ScriptHandler::postInstall"
-      ]
+      "drupal-scaffold": "DrupalComposer\\DrupalScaffold\\Plugin::scaffold"
     }
 }
