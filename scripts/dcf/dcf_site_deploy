@@ -43,7 +43,7 @@ function create_site {
   cd ${ABS_CONFIG_PATH}
   grep ${ID} sites.php -v > sites2.php
   cp -f sites2.php sites.php
-  for f in ${URL}
+  for f in ${URL_SETTING}
   do
     grep ${f} sites.php -v > sites2.php
     echo -n "\$sites[" >> sites2.php
@@ -182,7 +182,7 @@ function site_deploy {
     get_lang
   fi
   cd $ABS_DOCUMENT_ROOT
-  ${ABS_SCRIPTS_PATH}/drush site-install $PROFIL -y $LOCAL --account-name="${ADMIN_NAME}" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${URL0_HTTP}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
+  ${ABS_SCRIPTS_PATH}/drush site-install $PROFIL -y $LOCAL --account-name="${ADMIN_NAME}" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${HOST0}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
   cd $ABS_DCF_PATH
   setRight $ENVI
   echo ""

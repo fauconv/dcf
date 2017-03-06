@@ -98,12 +98,13 @@ function nodeVersion {
 #
 function setRight {
   if [ "$1" = "prod" ]; then
-    chmod -R 550 ${ABS_ROOT_PATH}
+    chmod -R 550 ${ABS_ROOT_PATH} ${ABS_ROOT_PATH}/*
     for f in ${ABS_MEDIAS_PATH}/*; do
-      chmod -R 770 ${f}
+      chmod -R 770 ${f} ${f}/*
     done
   else
-    chmod -R 770 ${ABS_ROOT_PATH}
+    echo "chmod -R 770 ${ABS_ROOT_PATH}"
+    chmod -R 770 ${ABS_ROOT_PATH} ${ABS_ROOT_PATH}/*
   fi
 }
 
@@ -120,6 +121,16 @@ function checkConposer {
   else
     echo "Composer self install OK"
   fi
+}
+
+#
+#update index.php
+#
+function setIndex {
+  cd ${ABS_DOCUMENT_ROOT}
+  sed "s|prod|$1|" index.php > index.php2
+  sed "s|dev|$1|" index.php2 > index.php
+  rm index.php2
 }
 
 #
@@ -156,6 +167,12 @@ while true; do
   case $1 in
     deploy )
       deploy "$2"
+      shift;
+      ;;
+    set )
+      setRight dev
+      setIndex "$2"
+      setRight "$2"
       shift;
       ;;
     site )

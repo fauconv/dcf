@@ -68,11 +68,7 @@ function deploy {
   rm .htaccess
   mv .htaccess2 .htaccess
 
-  #update index.php
-  cd ${ABS_DOCUMENT_ROOT}
-  sed "s|prod|$1|" index.php > index.php2
-  rm index.php
-  mv index.php2 index.php
+  setIndex $1
 
   #message
   example_local=${ABS_CONFIG_PATH}/${EXAMPLE}${LOCAL_CONF}
