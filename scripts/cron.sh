@@ -5,7 +5,8 @@
 #| version : VERSION_SCRIPT                                       |
 #+----------------------------------------------------------------+
 
-#CTM paths
+SOURCE_PATH='dcf'
+SOURCE_SCRIPT='dcf_path'
 SCRIPT_NAME=$(basename $0)
 ABS_SCRIPT_PATH=$(dirname `readlink -e $0`);
 if [ "$ABS_SCRIPT_PATH" = "" ]; then
@@ -27,7 +28,7 @@ do
   if [ "${NAME}" != "default" -a "${NAME}" != "." -a "${NAME}" != ".." -a "${NAME}" != "all" ]; then
     if [ -e ${ABS_CONFIG_PATH}/settings-${NAME}.php ]; then
       ID=`echo $NAME  sed | sed 's|site_||g'`
-      ${ABS_SCRIPTS_PATH}/drush @$ID cr
+      ${ABS_SCRIPTS_PATH}/drush @$ID cron
     fi
   fi
 done

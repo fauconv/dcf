@@ -1,0 +1,36 @@
+
+#
+#list task
+#
+function list {
+  echo ""
+    echo "= Not installed sites :"
+    echo "======================="
+    cd ${ABS_SITES_PATH}
+    for D in `find . -maxdepth 1 -type d`
+    do
+      NAME=`echo $D | sed 's|\./||g'`
+      if [ "${NAME}" != "default" -a "${NAME}" != "." -a "${NAME}" != ".." -a "${NAME}" != "all" ]; then
+        if [ ! -e "${ABS_CONFIG_PATH}/settings-${NAME}.php" ]; then
+        echo -n " - ${NAME}"
+        if [ -e ${ABS_CONFIG_PATH}/${NAME}${LOCAL_CONF} ]; then
+          echo " (Local config file present)"
+          else
+            echo ""
+          fi
+        fi
+      fi
+    done
+    echo ""
+    echo "= Live sites :"
+    echo "=============="
+    for D in `find . -maxdepth 1 -type d`
+    do
+      NAME=`echo $D | sed 's|\./||g'`
+      if [ "${NAME}" != "default" -a "${NAME}" != "." -a "${NAME}" != ".." -a "${NAME}" != "all" ]; then
+        if [ -e "${ABS_CONFIG_PATH}/settings-${NAME}.php" ]; then
+        echo " - ${NAME}"
+          fi
+        fi
+    done
+}

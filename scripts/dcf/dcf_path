@@ -14,9 +14,9 @@ CONFIG_PATH=config
 DOCUMENT_ROOT=web
 SITES_PATH=${DOCUMENT_ROOT}/sites #if change update sites.php
 DOC_PATH=docs
+SCRIPTS_PATH=scripts #if change update project.sh file
 VENDOR_PATH=vendor
 VENDOR_BIN_PATH=${VENDOR_PATH}/bin
-SCRIPTS_PATH=scripts #if change update project.sh file
 FILES_PATH=files
 TRANSLATIONS_PATH=${FILES_PATH}/translations
 MEDIAS_PATH=${DOCUMENT_ROOT}/media
@@ -58,5 +58,3 @@ ADMIN_NAME=developer
 LOCAL_CONF=.config.local.ini
 GLOBAL_CONF=.config.global.ini
 EXAMPLE=example
-
-CONF_EXT=".conf"

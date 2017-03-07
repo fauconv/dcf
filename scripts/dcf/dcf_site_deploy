@@ -2,8 +2,6 @@
 #+-----------------------------------------------------------+
 #|                                                           |
 #| code for the site deploy command                          |
-#| TODO : split settings.phpand set environment variable     |
-#|        (or use index var)                                 |
 #|                                                           |
 #+-----------------------------------------------------------+
 #| version : 1                                               |
@@ -11,7 +9,6 @@
 
 #
 # create sites.php in config
-# TODO: change it for drush plugin
 #
 function create_sites {
   if [ ! -e "${ABS_CONFIG_PATH}/sites.php" ]; then
@@ -22,24 +19,28 @@ function create_sites {
 
 #
 # create site directory
-# TODO: change it for drush plugin
 #
 function create_site {
   if [ ! -d "${ABS_SITE_PATH}" ]; then
     echo "Create site directory..."
+    setRight dev
     cp -r ${ABS_SITES_PATH}/default ${ABS_SITE_PATH}
     cp -R  ${ABS_MEDIAS_PATH}/default ${ABS_MEDIA_PATH}
     chmod -R 777 ${ABS_SITE_PATH} ${ABS_MEDIA_PATH}
-    mv ${ABS_SITE_PATH}/default.settings.php ${ABS_SITE_PATH}/settings.php
+    mv ${ABS_MEDIA_PATH}/default.settings.php ${ABS_MEDIA_PATH}/settings.php
+    echo -e "Create site directory...                                                        \e[32m\e[1m[ok]\e[0m"
   else
-    echo "Reinitializing site settings..."
-    rm ${ABS_SITE_PATH}/settings.php
-    cp ${ABS_SITE_PATH}/../default/default.settings.php ${ABS_SITE_PATH}/settings.php
+    echo "Reinitializing installation of site..."
+    setRight dev
     if [ ! -d ${ABS_MEDIA_PATH} ]; then
       cp -R  ${ABS_MEDIAS_PATH}/default ${ABS_MEDIA_PATH}
     fi
     chmod -R 777 ${ABS_MEDIA_PATH}
+    rm ${ABS_SITE_PATH}/settings.php
+    cp ${ABS_SITES_PATH}/default/default.settings.php ${ABS_SITE_PATH}/settings.php
+    echo -e "Reinitializing installalation of site...                                \e[32m\e[1m[ok]\e[0m"
   fi
+  echo "Configuring site..."  
   cd ${ABS_CONFIG_PATH}
   grep ${ID} sites.php -v > sites2.php
   cp -f sites2.php sites.php
@@ -54,7 +55,7 @@ function create_site {
     cp sites2.php sites.php
   done
   rm -f sites2.php
-  cd ${ABS_DCF_PATH}
+  echo -e "Configuring site...                                                   \e[32m\e[1m[ok]\e[0m"
 }
 
 #
@@ -108,8 +109,11 @@ function create_drush_alias {
   echo "\$options['root'] = '${ABS_DOCUMENT_ROOT}';" >> ${ID}.alias.drushrc.php
 }
 
+#
+# get po file
+#
 function get_lang {
-  DRUPAL_VERSION=`${ABS_VENDOR_BIN_PATH}/drush.php st --root="${ABS_DOCUMENT_ROOT}" | grep "Drupal version" | grep -o "8\.[0-9]\.[0-9]"`
+  DRUPAL_VERSION=`${ABS_DCRIPTS_PATH}/drush st | grep "Drupal version" | grep -o "8\.[0-9]\.[0-9]"`
   pofile="drupal-${DRUPAL_VERSION}.${LANG}.po"
   popath="${ABS_SITES_PATH}/${ID}/${TRANSLATIONS_PATH}/${pofile}"
   pofull="${popath}/${pofile}"
@@ -151,6 +155,18 @@ function create_htaccess {
 }
 
 #
+# cutting of setting.php file
+#
+function finalize {
+  echo "Cutting settings..."
+  setRight dev
+  cp ${ABS_CONFIG_PATH}/example.mock-default.xml ${ABS_CONFIG_PATH}/mock-${ID}.xml
+  cp ${ABS_CONFIG_PATH}/example.masquerade-default.xml ${ABS_CONFIG_PATH}/masquerade-${ID}.xml
+  setRight $ENV
+  echo -e "Cutting settings...                                                   \e[32m\e[1m[ok]\e[0m"
+}
+
+#
 # site deploy
 #
 function site_deploy {
@@ -184,7 +200,8 @@ function site_deploy {
   cd $ABS_DOCUMENT_ROOT
   ${ABS_SCRIPTS_PATH}/drush site-install $PROFIL -y $LOCAL --account-name="${ADMIN_NAME}" --account-mail="${ADMIN_MAIL}" --site-mail="no-reply@${HOST0}" --site-name="${SITE_NAME}" --sites-subdir="${ID}" --db-url="${DATABASE}"
   cd $ABS_DCF_PATH
-  setRight $ENVI
+  finalize
+  setRight $ENV
   echo ""
   echo "DONT FORGET TO NOTE the administrator password display above this message"
 }

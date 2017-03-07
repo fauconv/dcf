@@ -16,19 +16,19 @@ function deploy {
   if [ "${1}" = "dev" ]; then
     PROD=""
     DEV="--dev"
-    ENVI="dev"
+    ENV="dev"
   else
     if [ "${1}" = "prod" ]; then
       PROD="--no-dev"
       DEV=""
-      ENVI="prod"
+      ENV="prod"
     else
       echo ""
       echo -e "parameter 2 must be 'dev' or 'prod'. $1 given"
       showHelp;
     fi
   fi
-  echo "ENVI=${ENVI}" > ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/env
+  echo "ENV=${ENV}" > ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/env
 
   #set right
   setRight dev;

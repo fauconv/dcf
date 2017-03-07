@@ -7,7 +7,8 @@
 #| version : 1                                               |
 #+-----------------------------------------------------------+
 
-#DCF paths
+SOURCE_PATH='dcf'
+SOURCE_SCRIPT='dcf_path'
 SCRIPT_NAME=$(basename $0)
 ABS_SCRIPT_PATH=$(dirname `readlink -e $0`);
 if [ "$ABS_SCRIPT_PATH" = "" ]; then
@@ -15,7 +16,7 @@ if [ "$ABS_SCRIPT_PATH" = "" ]; then
   exit 1
 fi
 
-source ${ABS_SCRIPT_PATH}/dcf/dcf_path
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}
 
 VAR=`echo $PATH | grep "${PATH_SCRIPT_PATH}:"`
 if [ "$VAR" = "" ]; then

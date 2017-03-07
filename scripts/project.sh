@@ -26,6 +26,9 @@ fi
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_deploy
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_site_deploy
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_remove
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_list
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_dump
 if [ -f ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/env ]; then
   source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/env
 fi
@@ -44,31 +47,19 @@ function showHelp {
   echo "  -------------------------------"
   echo ""
   echo "  ${SCRIPT_NAME} deploy (dev | prod) : deploy or update DCF -> get or update DCF composer packages for "
-  echo "                                      the project and set project name."
-  echo "                                      => need internet access"
-  echo "  ${SCRIPT_NAME} fix                 : as \"site fix\" but for the common packages of the project"
-  echo "  ${SCRIPT_NAME} unfix               : as \"site unfix\" but for the common packages of the project"
+  echo "                                       the project and set project name."
+  echo "                                       => need internet access"
   echo "  ${SCRIPT_NAME} list                : list all web-site (site-id) in this project"
-  echo "  ${SCRIPT_NAME} package             : create a package for deployment in production of a project "
-  echo "                                       without web-site."
   echo "  ${SCRIPT_NAME} update              : update and rebuild all web-site in production or dev "
-  echo "  ${SCRIPT_NAME} set (dev | prod)    : change the environment configuration, and the file right "
-  echo "                                      protection"
+  echo "  ${SCRIPT_NAME} set (dev|prod)      : the file right protection. dev => all file writable"
   echo ""
   echo "  commands about a site of the farm:"
   echo "  ----------------------------------"
   echo ""
   echo "  ${SCRIPT_NAME} site deploy <site_id>   : create or install (if already exist) a web-site in the "
-  echo "                                          project for development (create skeleton + install "
-  echo "                                          packages(composer, npm, build) + install drupal)"
+  echo "                                          project for development (drupal install)"
   echo "                                          => you must set <ID>${LOCAL_CONF} and <ID>${GLOBAL_CONF} before."
-  echo "  ${SCRIPT_NAME} site rebuild <site-id>  : compil and build a site for frontend in development"
-  echo "  ${SCRIPT_NAME} site fix <site-id>      : Fix packages version (composer and npm) used for this site, "
-  echo "                                          usefull for production server, avoid unwanted update of package"
-  echo "  ${SCRIPT_NAME} site unfix <site-id>    : Unfix packages version (composer and npm) used for this site, "
-  echo "                                          usefull to try update website package in development"
   echo "  ${SCRIPT_NAME} site remove <site-id>   : remove an web-site (installed or not)"
-  echo "  ${SCRIPT_NAME} site package <site-id>  : create a package for deployment in production of a specific web-site"
   echo "  ${SCRIPT_NAME} site update <site-id>   : update and rebuild a web-site in production or dev"
   echo "  ${SCRIPT_NAME} site back <site-id>     : site configuration and data go back before the last snapshot or update"
   echo "  ${SCRIPT_NAME} site snapshot <site-id> : make a snapshot (backup) of the site to go back to this point later"
@@ -82,15 +73,14 @@ function showHelp {
 }
 
 #
-# display node version
 #
-function nodeVersion {
-  cd ${ABS_ROOT_PATH}
-  echo -n "Node version "
-  ${SCRIPTS_PATH}/node -v
-  echo -n "NPM version "
-  ${SCRIPTS_PATH}/npm -v
-  composer -V
+# check site exist
+#
+validate_exist() {
+  if [ -e ${ABS_CONFIG_PATH}/settings-${DIR_NAME}.php ]; then
+    echo -e "This site is already installed                                        \e[31m\e[1m[fail]\e[0m"
+    exit 1
+  fi
 }
 
 #
@@ -103,7 +93,6 @@ function setRight {
       chmod -R 770 ${f} ${f}/*
     done
   else
-    echo "chmod -R 770 ${ABS_ROOT_PATH}"
     chmod -R 770 ${ABS_ROOT_PATH} ${ABS_ROOT_PATH}/*
   fi
 }
@@ -128,9 +117,13 @@ function checkConposer {
 #
 function setIndex {
   cd ${ABS_DOCUMENT_ROOT}
-  sed "s|prod|$1|" index.php > index.php2
-  sed "s|dev|$1|" index.php2 > index.php
-  rm index.php2
+  if [ "$1" = "dev" ]; then
+    sed "s|prod|dev|" index.php > index.php2
+  else 
+    sed "s|dev|prod|" index.php2 > index.php
+  fi
+  rm index.php
+  mv index.php2 index.php
 }
 
 #
@@ -146,19 +139,20 @@ function checkPhp {
   fi
 }
 
-#retrive npm packages
-#nodeVersion
-#if [ "$1" = "prod" ]; then
-  #echo "NPM install (prod) :"
-  #${SCRIPTS_PATH}/npm install . --only=prod --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
-#else
-  #echo "NPM install (dev)"
-  #${SCRIPTS_PATH}/npm install . --nodedir=${SCRIPTS_PATH}/. --prefix=${DOCUMENT_ROOT}
-#fi
+#
+#
+#
+displaytime() {
+  runtime=$((end-start))
+  res=`date --date="@${runtime}" +%M\'%S`
+  echo ""
+  echo -e "script executed in \e[32m\e[1m${res}\e[0m"
+}
 
 #
 # main
 #
+start=`date +%s`
 if [ "$1" = "" ]; then
     showHelp
 fi
@@ -170,15 +164,24 @@ while true; do
       shift;
       ;;
     set )
-      setRight dev
-      setIndex "$2"
       setRight "$2"
       shift;
+      ;;
+    list )
+      list
       ;;
     site )
       case $2 in
         deploy )
           site_deploy "$3"
+          shift;
+          ;;
+        dump )
+          dump "$3"
+          shift;
+          ;;
+        remove )
+          site_remove "$3"
           shift;
           ;;
         * )
@@ -201,4 +204,7 @@ while true; do
   esac
   shift;
 done
+end=`date +%s`
+displaytime
+echo ""
 exit 0
