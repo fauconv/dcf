@@ -42,4 +42,4 @@ if [ ! -f "${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}" ]; then
 fi
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}
 
-php ${ABS_DRUSH_PATH}/drush.php "$@" --root=${ABS_DOCUMENT_ROOT} --alias-path=${ABS_DRUSH_ALIAS} --config=${ABS_DRUSH_CONFIG} --include=${ABS_DRUSH_CONFIG}
+php ${ABS_DRUSH_PATH}/drush.php "$@" -y --root=${ABS_DOCUMENT_ROOT} --alias-path=${ABS_DRUSH_ALIAS} --config=${ABS_DRUSH_CONFIG} --include=${ABS_DRUSH_CONFIG}
