@@ -26,6 +26,7 @@ fi
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_deploy
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_site_deploy
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_site_back
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_remove
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_list
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_dump
@@ -46,12 +47,12 @@ function showHelp {
   echo "  commands about the entire farm:"
   echo "  -------------------------------"
   echo ""
-  echo "  ${SCRIPT_NAME} deploy (dev | prod) : deploy or update DCF -> get or update DCF composer packages for "
-  echo "                                       the project and set project name."
-  echo "                                       => need internet access"
-  echo "  ${SCRIPT_NAME} list                : list all web-site (site-id) in this project"
-  echo "  ${SCRIPT_NAME} update              : update and rebuild all web-site in production or dev "
-  echo "  ${SCRIPT_NAME} set (dev|prod)      : the file right protection. dev => all file writable"
+  echo "  ${SCRIPT_NAME} deploy (dev|prod) : deploy or update DCF -> get or update DCF composer packages for "
+  echo "                                     the project and set project name."
+  echo "                                     => need internet access"
+  echo "  ${SCRIPT_NAME} list              : list all web-site (site-id) in this project"
+  echo "  ${SCRIPT_NAME} update            : update and rebuild all web-site in production or dev "
+  echo "  ${SCRIPT_NAME} set (dev|prod)    : the file right protection. dev => all file writable"
   echo ""
   echo "  commands about a site of the farm:"
   echo "  ----------------------------------"
@@ -171,17 +172,36 @@ while true; do
       list
       ;;
     site )
+      if [ "$3" = "" ]; then
+        echo ""
+        echo -e "\e[31m\e[1mSite id missing !\e[0m"
+        showHelp;
+      fi
+      ID=`echo $3 | sed 's|[^a-z]+||g'`
+      if [ "$ID" = "" ]; then
+        echo ""
+        echo -e "\e[31m\e[1mSite id can only contain lowercase !\e[0m"
+        echo ""
+        exit 1
+      fi
+      SITE_PATH=${SITES_PATH}/$ID
+      ABS_SITE_PATH=${ABS_SITES_PATH}/$ID
+      ABS_MEDIA_PATH=${ABS_MEDIAS_PATH}/$ID
       case $2 in
         deploy )
-          site_deploy "$3"
+          site_deploy
           shift;
           ;;
         dump )
-          dump "$3"
+          dump
           shift;
           ;;
         remove )
-          site_remove "$3"
+          site_remove
+          shift;
+          ;;
+        back )
+          site_back $4
           shift;
           ;;
         * )
