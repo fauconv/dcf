@@ -2,7 +2,7 @@
 #
 #
 #
-function back {
+function site_back {
   echo -e "go back to previous snapshot...";
   if [ "$1"="" ];then
     if [ ! -d $ABS_DUMP_PATH ]; then
@@ -21,6 +21,8 @@ function back {
       exit 1
     fi
   fi
-  ${ABS_SCRIPTS_PATH}/drush @$ID sql-connect < ${file}
+  file=$(realpath $file)
+  echo $file
+  ${ABS_SCRIPTS_PATH}/drush @$ID sql-cli < ${file}
   echo -e "go back to previous snapshot...                                \e[32m\e[1m[ok]\e[0m";
 }

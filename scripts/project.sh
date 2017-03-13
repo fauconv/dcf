@@ -9,9 +9,9 @@
 #| version : VERSION_SCRIPT                                  |
 #+-----------------------------------------------------------+
 
-#DCF paths and init
+#paths and init
 SOURCE_PATH='dcf'
-SOURCE_SCRIPT='dcf_path'
+SOURCE_SCRIPT='path.sh'
 SCRIPT_NAME=$(basename $0)
 ABS_SCRIPT_PATH=$(dirname `readlink -e $0`);
 if [ "$ABS_SCRIPT_PATH" = "" ]; then
@@ -24,12 +24,12 @@ if [ ! -f "${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}" ]; then
   exit 1
 fi
 source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/${SOURCE_SCRIPT}
-source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_deploy
-source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_site_deploy
-source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_site_back
-source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_remove
-source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_list
-source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_dump
+source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/deploy.sh
+source ${ABS_SOURCE_PATH}/site_deploy.sh
+source ${ABS_SOURCE_PATH}/site_back.sh
+source ${ABS_SOURCE_PATH}/site_remove.sh
+source ${ABS_SOURCE_PATH}/list.sh
+source ${ABS_SOURCE_PATH}/site_dump.sh
 if [ -f ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/env ]; then
   source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/env
 fi
@@ -62,7 +62,9 @@ function showHelp {
   echo "                                          => you must set <ID>${LOCAL_CONF} and <ID>${GLOBAL_CONF} before."
   echo "  ${SCRIPT_NAME} site remove <site-id>   : remove an web-site (installed or not)"
   echo "  ${SCRIPT_NAME} site update <site-id>   : update and rebuild a web-site in production or dev"
-  echo "  ${SCRIPT_NAME} site back <site-id>     : site configuration and data go back before the last snapshot or update"
+  echo "  ${SCRIPT_NAME} site back <site-id> [file] : site configuration and data go back before the last snapshot."
+  echo "                                              if a file is specified, the script use that file as snapshot instead of the last snapshot"
+  echo "                                              The file must be in dump directory"
   echo "  ${SCRIPT_NAME} site snapshot <site-id> : make a snapshot (backup) of the site to go back to this point later"
   echo ""
   echo " = More help :"
