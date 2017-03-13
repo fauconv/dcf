@@ -14,7 +14,6 @@ function back {
     do
       file=${ABS_DUMP_PATH}/$D
     done
-  fi
   else
     file=${ABS_DUMP_PATH}/$1
     if [! -f $file ]; then

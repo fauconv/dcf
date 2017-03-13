@@ -143,7 +143,7 @@ function checkPhp {
 #
 #
 #
-displaytime() {
+function displaytime {
   runtime=$((end-start))
   res=`date --date="@${runtime}" +%M\'%S`
   echo ""

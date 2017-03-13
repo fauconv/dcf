@@ -14,9 +14,12 @@ function list {
         if [ ! -e "${ABS_CONFIG_PATH}/settings-${NAME}.php" ]; then
         echo -n " - ${NAME}"
         if [ -e ${ABS_CONFIG_PATH}/${NAME}${LOCAL_CONF} ]; then
-          echo " (Local config file present)"
+          echo -n " (Local config file present)"
+        fi
+        if [ -e ${ABS_CONFIG_PATH}/${NAME}${GLOBAL_CONF} ]; then
+          echo ""
           else
-            echo ""
+          echo -e "\e[31m\e[1m (Global config file absent)\e[0m"
           fi
         fi
       fi

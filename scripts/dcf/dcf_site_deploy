@@ -27,7 +27,8 @@ function create_site {
     cp -r ${ABS_SITES_PATH}/default ${ABS_SITE_PATH}
     cp -R  ${ABS_MEDIAS_PATH}/default ${ABS_MEDIA_PATH}
     chmod -R 777 ${ABS_SITE_PATH} ${ABS_MEDIA_PATH}
-    mv ${ABS_MEDIA_PATH}/default.settings.php ${ABS_MEDIA_PATH}/settings.php
+    cp ${ABS_SOURCE_PATH}/default.settings.php ${ABS_SITE_PATH}/settings.php
+    rm ${ABS_SITE_PATH}/default.settings.php
     echo -e "Create site directory...                                                        \e[32m\e[1m[ok]\e[0m"
   else
     echo "Reinitializing installation of site..."
@@ -36,8 +37,8 @@ function create_site {
       cp -R  ${ABS_MEDIAS_PATH}/default ${ABS_MEDIA_PATH}
     fi
     chmod -R 777 ${ABS_MEDIA_PATH}
-    rm ${ABS_SITE_PATH}/settings.php
-    cp ${ABS_SITES_PATH}/default/default.settings.php ${ABS_SITE_PATH}/settings.php
+    mv ${ABS_SITE_PATH}/settings.php ${ABS_SITE_PATH}/settings.php.orig
+    cp ${ABS_SOURCE_PATH}/default.settings.php ${ABS_SITE_PATH}/settings.php
     echo -e "Reinitializing installalation of site...                                \e[32m\e[1m[ok]\e[0m"
   fi
   echo "Configuring site..."  
@@ -55,6 +56,8 @@ function create_site {
     cp sites2.php sites.php
   done
   rm -f sites2.php
+  cp ${ABS_SITE_PATH}/settings.php ${ABS_SITES_PATH}/default/default.settings.php
+  chmod 777 ${ABS_SITES_PATH}/default/default.settings.php
   echo -e "Configuring site...                                                   \e[32m\e[1m[ok]\e[0m"
 }
 
@@ -96,7 +99,7 @@ function read_config {
     echo ""
     exit 1
   fi
-  source ${ABS_SCRIPT_PATH}/${SOURCE_PATH}/dcf_url
+  source ${ABS_SOURCE_PATH}/dcf_url.sh
 }
 
 #
@@ -162,12 +165,13 @@ function finalize {
   setRight dev
   cp ${ABS_CONFIG_PATH}/example.mock-default.xml ${ABS_CONFIG_PATH}/mock-${ID}.xml
   cp ${ABS_CONFIG_PATH}/example.masquerade-default.xml ${ABS_CONFIG_PATH}/masquerade-${ID}.xml
+  cp ${ABS_SOURCE_PATH}/default.settings.php ${ABS_SITES_PATH}/default
   setRight $ENV
   echo -e "Cutting settings...                                                   \e[32m\e[1m[ok]\e[0m"
 }
 
 function addcmd {
-  sed "s|drush.php \"|drush.php @${ID} \"|1" ${ABS_SITE_PATH}/drush > ${ABS_SCRIPTS_PATH}/@${ID}
+  sed "s|drush.php \"|drush.php @${ID} \"|1" ${ABS_SCRIPTS_PATH}/drush > ${ABS_SCRIPTS_PATH}/@${ID}
 }
 
 #
