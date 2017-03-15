@@ -59,10 +59,14 @@ nbproject/**/*
 /config/*.config.local.ini
 !/config/example.config.*
 /config/site_*
-/config/settings-site_*
-/config/masquerade-site_*
-/config/mock-site_*
-/config/parameters-site_*
+/config/settings-*
+/config/masquerade-*
+/config/mock-*
+/config/parameters-*
+/config/sites.php
+/drush/site-aliases/*
+/dump/*
+/scripts/@*
 
 # Drupal files and contrib
 /web/.*
@@ -70,6 +74,8 @@ nbproject/**/*
 /web/libraries/drupal-code-builder
 /web/core/**/*
 /web/core/*
+/web/media/*
+/web/media/**/*
 /web/sites/default/*
 /web/sites/default/**/*
 /web/autoload.php

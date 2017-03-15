@@ -99,7 +99,7 @@ function read_config {
     echo ""
     exit 1
   fi
-  source ${ABS_SOURCE_PATH}/dcf_url.sh
+  source ${ABS_SOURCE_PATH}/url.sh
 }
 
 #
